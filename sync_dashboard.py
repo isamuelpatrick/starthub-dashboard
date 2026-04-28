@@ -37,7 +37,7 @@ CHECK_INTERVAL = 60
 
 EXCEL_PATH  = WORK_DIR / EXCEL_FILE
 GENERATOR   = WORK_DIR / "generate_dashboard.py"
-DASHBOARD   = WORK_DIR / "dashboard.html"
+DASHBOARD   = WORK_DIR / "index.html"
 LOG_FILE    = WORK_DIR / "sync_log.txt"
 
 def log(msg: str):
@@ -59,7 +59,7 @@ def run(cmd: list, cwd=None):
 def git_push():
     """Commit the new dashboard.html and push to GitHub."""
     ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    run(["git", "add", "dashboard.html"])
+    run(["git", "add", "index.html"])
     run(["git", "commit", "-m", f"Auto-update dashboard {ts}"])
     run(["git", "push"])
 

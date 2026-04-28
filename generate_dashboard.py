@@ -19,7 +19,7 @@ from pathlib import Path
 from datetime import date
 
 EXCEL_FILE = Path(__file__).parent / 'StartHub Africa Impact Dashboard (2).xlsx'
-OUTPUT_FILE = Path(__file__).parent / 'dashboard.html'
+OUTPUT_FILE = Path(__file__).parent / 'index.html'
 
 COUNTRIES = ['Uganda', 'Tanzania', 'Kenya']
 MONTHS    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
@@ -1327,7 +1327,7 @@ def main():
     OUTPUT_FILE.write_text(html, encoding='utf-8')
     size_kb = OUTPUT_FILE.stat().st_size // 1024
     print(f"✅ Dashboard saved: {OUTPUT_FILE} ({size_kb} KB)")
-    print(f"\nUpload 'dashboard.html' to OneDrive to share with the team.")
+    print(f"\nPush index.html to GitHub to publish — or let sync_dashboard.py do it automatically.")
     print("Re-run this script any time you update the Excel file.")
 
 if __name__ == '__main__':
