@@ -48,8 +48,55 @@ body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,sans
 .logo-text h1{font-size:1rem;font-weight:800;color:var(--txt);line-height:1}
 .logo-text span{font-size:.68rem;color:var(--muted)}
 .header-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.filter-pill{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:4px 10px}
-.filter-pill label{font-size:.7rem;font-weight:600;color:var(--muted);white-space:nowrap}
+
+/* Filter dropdown pills */
+.filter-dd{
+  position:relative;display:flex;align-items:center;gap:6px;
+  background:var(--surface2);border:1px solid var(--border2);border-radius:6px;
+  padding:5px 10px;cursor:pointer;user-select:none;
+  transition:border-color .15s,background .15s;
+}
+.filter-dd:hover,.filter-dd.open{background:var(--surface);border-color:#0284C7}
+.filter-dd .fd-label{font-size:.68rem;font-weight:700;color:var(--muted);white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}
+.filter-dd .fd-val{font-size:.78rem;font-weight:700;color:var(--txt);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.filter-dd .fd-caret{font-size:.6rem;color:var(--muted);transition:transform .15s}
+.filter-dd.open .fd-caret{transform:rotate(180deg)}
+
+/* Dropdown panel */
+.fd-panel{
+  display:none;position:absolute;top:calc(100% + 6px);left:0;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,.12);
+  min-width:200px;max-height:320px;overflow-y:auto;
+  z-index:400;padding:6px 0;
+}
+.fd-panel.open{display:block}
+.fd-row{
+  display:flex;align-items:center;gap:9px;
+  padding:7px 14px;cursor:pointer;
+  transition:background .08s;
+}
+.fd-row:hover{background:var(--surface2)}
+.fd-row.all-row{border-bottom:1px solid var(--border);font-weight:700}
+.fd-row input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:#0284C7;flex-shrink:0}
+.fd-row span{font-size:.74rem;font-weight:600;color:var(--txt2);line-height:1.3}
+.fd-row.all-row span{color:var(--txt);font-weight:700}
+.fd-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:18px;height:18px;padding:0 5px;
+  background:#0284C7;color:#fff;border-radius:9px;
+  font-size:.6rem;font-weight:800;margin-left:4px;flex-shrink:0;
+}
+.fd-search-wrap{padding:8px 10px 6px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.fd-search{
+  width:100%;box-sizing:border-box;padding:5px 8px 5px 26px;
+  border:1px solid var(--border2);border-radius:6px;
+  font-size:.75rem;background:var(--surface);color:var(--txt);outline:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:8px center;
+}
+.fd-search:focus{border-color:#0284C7;background:#F0F7FF}
+
 select{background:transparent;border:none;color:var(--txt);font-size:.8rem;font-weight:600;cursor:pointer;outline:none;padding:2px 0}
 .updated{font-size:.68rem;color:var(--muted);margin-left:auto;white-space:nowrap}
 
@@ -240,8 +287,24 @@ select{background:transparent;border:none;color:var(--txt);font-size:.8rem;font-
     <div class="logo-text"><h1>StartHub Africa</h1><span>Impact Dashboard</span></div>
   </div>
   <div class="header-filters">
-    <div class="filter-pill"><label>Year</label><select id="filter-year"><option value="all">All Years</option></select></div>
-    <div class="filter-pill"><label>Country</label><select id="filter-country"><option value="all">All Countries</option><option value="Uganda">Uganda</option><option value="Tanzania">Tanzania</option><option value="Kenya">Kenya</option></select></div>
+    <div class="filter-dd" id="fd-year">
+      <span class="fd-label">Year</span>
+      <span class="fd-val" id="fdv-year">All Years</span>
+      <span class="fd-caret">▾</span>
+      <div class="fd-panel" id="fdp-year"></div>
+    </div>
+    <div class="filter-dd" id="fd-country">
+      <span class="fd-label">Country</span>
+      <span class="fd-val" id="fdv-country">All Countries</span>
+      <span class="fd-caret">▾</span>
+      <div class="fd-panel" id="fdp-country"></div>
+    </div>
+    <div class="filter-dd" id="fd-project">
+      <span class="fd-label">Project</span>
+      <span class="fd-val" id="fdv-project">All Projects</span>
+      <span class="fd-caret">▾</span>
+      <div class="fd-panel" id="fdp-project"></div>
+    </div>
   </div>
   <div class="updated">Updated: <span id="updated-date"></span></div>
 </div>
@@ -373,11 +436,14 @@ const PROJ_BORDER = [
 
 // ── State ──────────────────────────────────────────────────────────────────
 const state = {
-  year:'all', country:'all',
+  // null = all selected; Set = specific selections
+  activeYears: null,
+  activeCountries: null,
+  activeProjects: null,
   activeMetrics: METRICS.map(m=>m.key),
   countryMetrics: METRICS.map(m=>m.key),
   drillSort:'trained_total', drillCountry:'all',
-  drillSearch:'', drillSelected:null,   // null = all selected
+  drillSearch:'', drillSelected:null,
 };
 
 let charts = {};
@@ -386,19 +452,70 @@ let modalChart = null;
 // ── Data helpers ───────────────────────────────────────────────────────────
 const getYears = () => Object.keys(DATA.years).sort();
 
-function getMetrics(yr, country){
-  const d = DATA.years[yr]; if(!d) return null;
-  if(country==='all') return d.totals;
-  return d.countries?.[country]?.totals || null;
+// Active filter getters (null state = everything)
+const getActiveYears     = () => state.activeYears     ? [...state.activeYears].sort()     : getYears();
+const getActiveCountries = () => state.activeCountries ? [...state.activeCountries]         : [...COUNTRIES];
+
+// Full blank covering all raw metric keys
+function blankFull(){
+  return {trained_m:0,trained_f:0,trained_total:0,tot_m:0,tot_f:0,tot_total:0,
+           biz_supported:0,biz_started:0,jobs:0,internships:0,
+           grants_count:0,grants_value:0,revenue_baseline:0,revenue_endline:0,cohort_companies:0};
+}
+
+// Core aggregator — sums metrics for given years + countries, respecting project filter
+function aggregate(years, countries){
+  const yrs  = years     || getYears();
+  const ctrs = countries || COUNTRIES;
+  const tot  = blankFull();
+  for(const yr of yrs){
+    const yd = DATA.years[yr]; if(!yd) continue;
+    for(const c of ctrs){
+      if(state.activeProjects){
+        // sum only matching project rows
+        for(const p of (yd.countries?.[c]?.projects||[])){
+          if(state.activeProjects.has(normName(p.name).toLowerCase())){
+            Object.keys(p.metrics||{}).forEach(k=>{ tot[k]=(tot[k]||0)+(p.metrics[k]||0); });
+          }
+        }
+      } else {
+        const m = yd.countries?.[c]?.totals;
+        if(m) Object.keys(tot).forEach(k=>{ tot[k]=(tot[k]||0)+(m[k]||0); });
+      }
+    }
+  }
+  return tot;
 }
 
 function getFiltered(){
-  if(state.year==='all'){
-    if(state.country==='all') return DATA.overall.all||{};
-    return DATA.overall.countries?.[state.country]||{};
-  }
-  return getMetrics(state.year, state.country)||{};
+  return aggregate(getActiveYears(), getActiveCountries());
 }
+
+// Legacy shim used by modal and any remaining callers
+function getMetrics(yr, country){
+  return aggregate([yr], country==='all' ? null : [country]);
+}
+
+// Project names for a specific set of years (drives the project dropdown)
+function getProjectNamesForYears(years){
+  const seen = new Set(); const names = [];
+  for(const yr of years){
+    const yd = DATA.years[yr]; if(!yd) continue;
+    for(const c of COUNTRIES){
+      for(const p of (yd.countries?.[c]?.projects||[])){
+        const key = normName(p.name).toLowerCase();
+        if(!seen.has(key)){
+          seen.add(key);
+          names.push({key, label:normName(p.name).replace(/\w/g,ch=>ch.toUpperCase())});
+        }
+      }
+    }
+  }
+  return names.sort((a,b)=>a.label.localeCompare(b.label));
+}
+
+// All unique project names regardless of year
+function getAllProjectNames(){ return getProjectNamesForYears(getYears()); }
 
 function fmt(v, prefix=''){
   if(!v||v===0) return '—';
@@ -417,13 +534,14 @@ function pct(a,b){ return b>0?Math.round(a/b*100):0; }
 function normName(n){ return (n||'').trim().replace(/\s+/g,' '); }
 
 function getProjects(drillCountry){
-  const years = state.year==='all'?getYears():[state.year];
-  const map = {};   // key → entry
-  const display = {}; // key → canonical display name
+  const years      = getActiveYears();
+  const headerCtrs = getActiveCountries();
+  const map = {};
   for(const yr of years){
     const yd = DATA.years[yr]; if(!yd) continue;
     for(const c of COUNTRIES){
       if(drillCountry!=='all'&&c!==drillCountry) continue;
+      if(!headerCtrs.includes(c)) continue;
       for(const p of (yd.countries?.[c]?.projects||[])){
         // normalise key: lowercase + trim → merges capitalisation variants
         const key = normName(p.name).toLowerCase()+'||'+c;
@@ -432,10 +550,7 @@ function getProjects(drillCountry){
             map[key].metrics[k]=(map[key].metrics[k]||0)+(p.metrics[k]||0);
           });
         } else {
-          // prefer the title-cased / capitalised variant as display name
-          const raw = normName(p.name);
-          const titled = raw.replace(/\w/g,ch=>ch.toUpperCase());
-          display[key] = titled;
+          const titled = normName(p.name).replace(/\w/g,ch=>ch.toUpperCase());
           map[key]={name:titled,country:c,metrics:{...(p.metrics||{})}};
         }
       }
@@ -520,11 +635,12 @@ function renderTrendChecks(){
 }
 
 function buildTrendDatasets(){
-  const years = getYears();
+  const years = getActiveYears();
+  const ctrs  = getActiveCountries();
   return {
     labels: years,
     datasets: METRICS.filter(m=>state.activeMetrics.includes(m.key)).map(m=>{
-      const vals = years.map(yr=>{const mm=getMetrics(yr,state.country);return mm?mm[m.key]||0:0;});
+      const vals = years.map(yr=>aggregate([yr],ctrs)[m.key]||0);
       return {
         label:m.label, data:vals,
         borderColor:m.color, backgroundColor:m.color+'22',
@@ -569,15 +685,16 @@ function updateTrend(){
 
 // ── Donut Chart ─────────────────────────────────────────────────────────────
 function renderDonut(){
-  const yrs = state.year==='all'?getYears():[state.year];
-  const vals = COUNTRIES.map(c=>yrs.reduce((s,yr)=>{const m=getMetrics(yr,c);return s+(m?.trained_total||0);},0));
+  const yrs  = getActiveYears();
+  const ctrs = getActiveCountries();
+  const vals = ctrs.map(c=>aggregate(yrs,[c]).trained_total||0);
   const ctx = document.getElementById('donut-chart');
   if(charts.donut) charts.donut.destroy();
   charts.donut = new Chart(ctx,{
     type:'doughnut',
-    data:{labels:COUNTRIES,datasets:[{
-      data:vals, backgroundColor:COUNTRIES.map(c=>COUNTRY_BG[c]),
-      borderColor:COUNTRIES.map(c=>COUNTRY_COLORS[c]), borderWidth:2, hoverOffset:8
+    data:{labels:ctrs,datasets:[{
+      data:vals, backgroundColor:ctrs.map(c=>COUNTRY_BG[c]),
+      borderColor:ctrs.map(c=>COUNTRY_COLORS[c]), borderWidth:2, hoverOffset:8
     }]},
     options:{
       responsive:true,maintainAspectRatio:false,cutout:'62%',
@@ -599,29 +716,21 @@ function renderCountryChecks(){
 
 // ── Country Metrics Table ────────────────────────────────────────────────────
 function renderCountryTable(){
-  const yrs = state.year==='all'?getYears():[state.year];
+  const yrs  = getActiveYears();
+  const ctrs = getActiveCountries();
   const cData = {};
-  for(const c of COUNTRIES){
-    const tot = blank();
-    for(const yr of yrs){
-      const m=getMetrics(yr,c)||{};
-      Object.keys(tot).forEach(k=>tot[k]+=(m[k]||0));
-    }
-    cData[c]=tot;
-  }
+  for(const c of ctrs) cData[c] = aggregate(yrs,[c]);
 
   const visibleMetrics = METRICS.filter(m=>state.countryMetrics.includes(m.key));
-
-  // Max per metric across countries
   const maxes = {};
   visibleMetrics.forEach(met=>{
-    maxes[met.key]=Math.max(...COUNTRIES.map(c=>cData[c][met.key]||0),1);
+    maxes[met.key]=Math.max(...ctrs.map(c=>cData[c][met.key]||0),1);
   });
 
   let html=`<div style="overflow-x:auto"><table class="country-metrics-table">
     <thead><tr>
       <th style="min-width:160px">Metric</th>
-      ${COUNTRIES.map(c=>`<th style="min-width:140px"><div class="country-col-head">
+      ${ctrs.map(c=>`<th style="min-width:140px"><div class="country-col-head">
         <span class="c-badge" style="background:${COUNTRY_COLORS[c]}">${c.substring(0,2).toUpperCase()}</span>${c}
       </div></th>`).join('')}
     </tr></thead>
@@ -629,7 +738,7 @@ function renderCountryTable(){
 
   for(const met of visibleMetrics){
     html+=`<tr><td class="metric-col" style="position:unset;border-right:none;max-width:none">${met.icon} ${met.label}</td>`;
-    for(const c of COUNTRIES){
+    for(const c of ctrs){
       const v=cData[c][met.key]||0;
       const barW=Math.round(v/maxes[met.key]*100);
       html+=`<td>
@@ -651,9 +760,10 @@ function blank(){ return Object.fromEntries(METRICS.map(m=>[m.key,0])); }
 
 // ── Gender Chart ─────────────────────────────────────────────────────────────
 function renderGender(){
-  const years = getYears();
-  const mVals = years.map(yr=>{const m=getMetrics(yr,state.country);return m?.trained_m||0;});
-  const fVals = years.map(yr=>{const m=getMetrics(yr,state.country);return m?.trained_f||0;});
+  const years = getActiveYears();
+  const ctrs  = getActiveCountries();
+  const mVals = years.map(yr=>aggregate([yr],ctrs).trained_m||0);
+  const fVals = years.map(yr=>aggregate([yr],ctrs).trained_f||0);
   const ctx = document.getElementById('gender-chart');
   if(charts.gender) charts.gender.destroy();
   charts.gender = new Chart(ctx,{
@@ -680,7 +790,7 @@ function renderGender(){
 
 // ── Grants Chart ─────────────────────────────────────────────────────────────
 function renderGrants(){
-  const ps = getProjects(state.country).filter(p=>(p.metrics.grants_value||0)>0)
+  const ps = getProjects('all').filter(p=>(p.metrics.grants_value||0)>0)
     .sort((a,b)=>(b.metrics.grants_value||0)-(a.metrics.grants_value||0)).slice(0,14);
   const wrap = document.getElementById('grants-wrap');
   if(!ps.length){ wrap.innerHTML='<div class="no-data">No grant data for selected filters</div>'; if(charts.grants)charts.grants.destroy(); return; }
@@ -871,13 +981,18 @@ function openModal(yr){
   const yd=DATA.years[yr];
   if(!yd?.monthly||!Object.keys(yd.monthly).length){ alert(`Monthly data not available for ${yr}`); return; }
   const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const c=state.country;
+  const actCtrs = getActiveCountries();
+  const singleC = actCtrs.length===1 ? actCtrs[0] : null;
   const getV=(m,k)=>{
-    if(c!=='all'&&yd.countries?.[c]?.monthly?.[m]) return yd.countries[c].monthly[m][k]||0;
+    if(singleC&&yd.countries?.[singleC]?.monthly?.[m]) return yd.countries[singleC].monthly[m][k]||0;
+    if(!singleC){
+      // sum across active countries
+      return actCtrs.reduce((s,c)=>s+(yd.countries?.[c]?.monthly?.[m]?.[k]||0),0) || (yd.monthly?.[m]?.[k]||0);
+    }
     return yd.monthly?.[m]?.[k]||0;
   };
   document.getElementById('modal-title').textContent=`Monthly Breakdown — ${yr}`;
-  document.getElementById('modal-sub').textContent=`${c==='all'?'All Countries':c} · Click outside to close`;
+  document.getElementById('modal-sub').textContent=`${singleC||'All Countries'} · Click outside to close`;
   document.getElementById('modal-overlay').classList.add('open');
   const ctx=document.getElementById('modal-chart');
   if(modalChart)modalChart.destroy();
@@ -924,14 +1039,144 @@ function renderAll(){
   renderDrill();
 }
 
+// ── Header filter dropdown builder ────────────────────────────────────────────
+function buildFilterDropdown({pillId, panelId, valId, items, stateKey, allLabel, onChange, searchable}){
+  const pill  = document.getElementById(pillId);
+  const panel = document.getElementById(panelId);
+  const valEl = document.getElementById(valId);
+  if(!pill||!panel||!valEl) return;
+
+  let searchQ = '';
+
+  // items can be an array or a function that returns an array (for dynamic lists)
+  const resolveItems = () => typeof items==='function' ? items() : items;
+
+  function getSelected(){ return state[stateKey]; }
+
+  function updatePillLabel(){
+    const sel = getSelected();
+    const allItems = resolveItems();
+    if(!sel||sel.size===0){
+      valEl.textContent = allLabel;
+      const badge = pill.querySelector('.fd-badge');
+      if(badge) badge.remove();
+    } else {
+      const names = allItems.filter(i=>sel.has(i.key)).map(i=>i.label);
+      valEl.textContent = names.length===0 ? allLabel : names.length<=2 ? names.join(', ') : names[0]+' +'+(names.length-1);
+      let badge = pill.querySelector('.fd-badge');
+      if(!badge){ badge=document.createElement('span'); badge.className='fd-badge'; pill.insertBefore(badge,panel); }
+      badge.textContent = sel.size;
+    }
+  }
+
+  function buildPanel(){
+    const allItems = resolveItems();
+    const visible  = searchQ ? allItems.filter(i=>i.label.toLowerCase().includes(searchQ.toLowerCase())) : allItems;
+    const sel = getSelected();
+    const allChecked  = !sel || sel.size===allItems.length;
+    const someChecked = sel && sel.size>0 && sel.size<allItems.length;
+
+    let h = '';
+    if(searchable){
+      h += `<div class="fd-search-wrap"><input type="text" class="fd-search" placeholder="Search…" value="${searchQ}" autocomplete="off"></div>`;
+    }
+    h += `<label class="fd-row all-row"><input type="checkbox" id="${pillId}-all"${allChecked?' checked':''}><span>${allLabel} (${allItems.length})</span></label>`;
+    for(const item of visible){
+      const chk = !sel || sel.has(item.key);
+      h += `<label class="fd-row"><input type="checkbox" class="fd-cb" data-key="${item.key}"${chk?' checked':''}><span>${item.label}</span></label>`;
+    }
+    if(visible.length===0) h += `<div style="padding:10px 14px;font-size:.72rem;color:var(--muted)">No matches</div>`;
+    panel.innerHTML = h;
+
+    // Wire search box
+    if(searchable){
+      const si = panel.querySelector('.fd-search');
+      si.addEventListener('input', e=>{
+        e.stopPropagation();
+        searchQ = e.target.value;
+        buildPanel();
+        const ni = panel.querySelector('.fd-search');
+        if(ni){ ni.focus(); ni.setSelectionRange(ni.value.length,ni.value.length); }
+      });
+      si.addEventListener('click',  e=>e.stopPropagation());
+      si.addEventListener('keydown',e=>e.stopPropagation());
+    }
+
+    const allBox = panel.querySelector(`#${pillId}-all`);
+    allBox.indeterminate = someChecked;
+    allBox.addEventListener('change',()=>{
+      state[stateKey] = allBox.checked ? null : new Set();
+      searchQ=''; buildPanel(); updatePillLabel(); onChange();
+    });
+    panel.querySelectorAll('.fd-cb').forEach(cb=>{
+      cb.addEventListener('change',e=>{
+        e.stopPropagation();
+        const cur = getSelected() ? new Set(getSelected()) : new Set(allItems.map(i=>i.key));
+        if(cb.checked) cur.add(cb.dataset.key); else cur.delete(cb.dataset.key);
+        state[stateKey] = cur.size===allItems.length ? null : cur;
+        buildPanel(); updatePillLabel(); onChange();
+      });
+    });
+  }
+
+  // Toggle open/close
+  pill.addEventListener('click', e=>{
+    e.stopPropagation();
+    const isOpen = panel.classList.contains('open');
+    document.querySelectorAll('.fd-panel.open').forEach(p=>{ p.classList.remove('open'); p.closest('.filter-dd')?.classList.remove('open'); });
+    if(!isOpen){ searchQ=''; buildPanel(); panel.classList.add('open'); pill.classList.add('open'); }
+  });
+  panel.addEventListener('click',e=>e.stopPropagation());
+
+  updatePillLabel();
+
+  // Return handle for external control
+  return {
+    refresh: updatePillLabel,
+    pruneInvalid(){
+      const validKeys = new Set(resolveItems().map(i=>i.key));
+      const sel = getSelected();
+      if(sel){
+        const pruned = new Set([...sel].filter(k=>validKeys.has(k)));
+        state[stateKey] = pruned.size===0 ? null : (pruned.size===validKeys.size ? null : pruned);
+        updatePillLabel();
+      }
+    }
+  };
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click',()=>{
+  document.querySelectorAll('.fd-panel.open').forEach(p=>{ p.classList.remove('open'); p.closest('.filter-dd')?.classList.remove('open'); });
+});
+
 function init(){
   document.getElementById('updated-date').textContent=DATA.updated;
 
-  // Year filter
-  const sel=document.getElementById('filter-year');
-  getYears().forEach(yr=>{ const o=document.createElement('option'); o.value=yr; o.textContent=yr; sel.appendChild(o); });
-  sel.addEventListener('change',e=>{ state.year=e.target.value; renderAll(); });
-  document.getElementById('filter-country').addEventListener('change',e=>{ state.country=e.target.value; renderAll(); });
+  // Project filter (built first so Year can reference it)
+  const projFilter = buildFilterDropdown({
+    pillId:'fd-project', panelId:'fdp-project', valId:'fdv-project',
+    items: ()=>getProjectNamesForYears(getActiveYears()),  // dynamic: respects active years
+    stateKey:'activeProjects', allLabel:'All Projects',
+    onChange: renderAll,
+    searchable: true
+  });
+
+  // Year filter — when years change, prune invalid project selections then re-render
+  buildFilterDropdown({
+    pillId:'fd-year', panelId:'fdp-year', valId:'fdv-year',
+    items: getYears().map(y=>( {key:y, label:y} )),
+    stateKey:'activeYears', allLabel:'All Years',
+    onChange: ()=>{ projFilter.pruneInvalid(); renderAll(); }
+  });
+
+  // Country filter
+  buildFilterDropdown({
+    pillId:'fd-country', panelId:'fdp-country', valId:'fdv-country',
+    items: COUNTRIES.map(c=>( {key:c, label:c} )),
+    stateKey:'activeCountries', allLabel:'All Countries',
+    onChange: renderAll
+  });
 
   // Drill-down controls
   document.getElementById('drill-sort').addEventListener('change',e=>{ state.drillSort=e.target.value; renderDrill(); });
@@ -940,18 +1185,16 @@ function init(){
   // Drill search
   document.getElementById('drill-search').addEventListener('input',e=>{
     state.drillSearch=e.target.value;
-    const dc = state.drillCountry;
-    const allP = getProjects(dc);
+    const allP = getProjects(state.drillCountry);
     allP.sort((a,b)=>(b.metrics[state.drillSort]||0)-(a.metrics[state.drillSort]||0));
     renderDrillSelector(allP);
-    // don't reset selection or re-render the full table when just typing
   });
 
   // Modal
   document.getElementById('modal-close').addEventListener('click',()=>document.getElementById('modal-overlay').classList.remove('open'));
   document.getElementById('modal-overlay').addEventListener('click',e=>{ if(e.target.id==='modal-overlay') document.getElementById('modal-overlay').classList.remove('open'); });
 
-  // Charts
+  // Initial render
   renderTrendChecks();
   renderCountryChecks();
   initTrend();
