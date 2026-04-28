@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>StartHub Africa — Impact Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F0F4F8;
+  --surface:#FFFFFF;
+  --surface2:#F8FAFC;
+  --border:#E2E8F0;
+  --border2:#CBD5E1;
+  --txt:#0F172A;
+  --txt2:#334155;
+  --muted:#64748B;
+  --shadow:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.06),0 2px 4px rgba(0,0,0,.04);
+  --radius:10px;
+  /* Metric accent colours */
+  --c-trained:#0284C7;
+  --c-tot:#7C3AED;
+  --c-biz-sup:#B45309;
+  --c-biz-sta:#059669;
+  --c-jobs:#DC2626;
+  --c-intern:#2563EB;
+  --c-grants-n:#BE185D;
+  --c-grants-v:#EA580C;
+  /* Country colours */
+  --uganda:#0891B2;
+  --tanzania:#D97706;
+  --kenya:#DC2626;
+}
+html{font-size:14px;color-scheme:light}
+body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+
+/* ── Header ── */
+#header{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:12px 24px;display:flex;align-items:center;gap:16px;
+  position:sticky;top:0;z-index:200;flex-wrap:wrap;
+  box-shadow:var(--shadow);
+}
+.logo{display:flex;align-items:center;gap:10px;flex:1;min-width:180px}
+.logo svg{width:34px;height:34px}
+.logo-text h1{font-size:1rem;font-weight:800;color:var(--txt);line-height:1}
+.logo-text span{font-size:.68rem;color:var(--muted)}
+.header-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filter-pill{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:4px 10px}
+.filter-pill label{font-size:.7rem;font-weight:600;color:var(--muted);white-space:nowrap}
+select{background:transparent;border:none;color:var(--txt);font-size:.8rem;font-weight:600;cursor:pointer;outline:none;padding:2px 0}
+.updated{font-size:.68rem;color:var(--muted);margin-left:auto;white-space:nowrap}
+
+/* ── Layout ── */
+#main{padding:20px 24px;max-width:1600px;margin:0 auto}
+.sec-label{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.mb{margin-bottom:22px}
+
+/* ── KPI Cards ── */
+#kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px}
+.kpi{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px 16px;border-top:3px solid var(--accent,#0284C7);
+  box-shadow:var(--shadow);transition:box-shadow .15s,transform .15s;
+}
+.kpi:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.kpi-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px}
+.kpi-value{font-size:1.75rem;font-weight:800;color:var(--txt);line-height:1;font-variant-numeric:tabular-nums}
+.kpi-sub{font-size:.68rem;color:var(--muted);margin-top:5px;display:flex;gap:8px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:.65rem;font-weight:600;padding:2px 6px;border-radius:4px}
+.badge-m{background:#DBEAFE;color:#1E40AF}
+.badge-f{background:#FCE7F3;color:#9D174D}
+
+/* ── Chart cards ── */
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
+.chart-card h3{font-size:.82rem;font-weight:700;color:var(--txt);margin-bottom:2px}
+.chart-meta{font-size:.68rem;color:var(--muted);margin-bottom:12px}
+.chart-wrap canvas{width:100%!important}
+.charts-2{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+.charts-eq{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:900px){.charts-2,.charts-eq{grid-template-columns:1fr}}
+
+/* ── Metric Checkboxes ── */
+.mcheck-group{display:flex;flex-wrap:wrap;gap:6px 14px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px}
+.mcheck-item{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;white-space:nowrap}
+.mcheck-item input[type=checkbox]{
+  width:15px;height:15px;cursor:pointer;accent-color:var(--chk-col,#0284C7);
+  flex-shrink:0;
+}
+.mcheck-item span{font-size:.72rem;font-weight:600;color:var(--txt2)}
+.mcheck-item.all-item span{font-weight:700;color:var(--txt)}
+.mcheck-sep{width:1px;background:var(--border);align-self:stretch;margin:0 4px}
+
+/* ── Country Metrics Table ── */
+.country-metrics-table{width:100%;border-collapse:collapse;font-size:.76rem}
+.country-metrics-table th{
+  padding:8px 12px;text-align:left;font-weight:700;font-size:.65rem;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+  border-bottom:2px solid var(--border);white-space:nowrap;
+}
+.country-metrics-table td{
+  padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;
+}
+.country-metrics-table tr:last-child td{border-bottom:none}
+.country-metrics-table tr:hover td{background:var(--surface2)}
+.c-badge{
+  display:inline-block;font-size:.6rem;font-weight:800;padding:2px 6px;
+  border-radius:4px;color:#fff;margin-right:6px;letter-spacing:.04em;
+}
+.metric-bar-cell{display:flex;align-items:center;gap:6px}
+.mini-bar{height:5px;border-radius:3px;min-width:2px;flex-shrink:0}
+.num-cell{font-variant-numeric:tabular-nums;font-weight:700;color:var(--txt);text-align:right}
+.country-col-head{display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700}
+
+/* ── Project Drill-Down ── */
+.drill-controls{display:flex;gap:10px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+.drill-controls label{font-size:.7rem;font-weight:600;color:var(--muted)}
+.ctrl-select{
+  background:var(--surface);border:1px solid var(--border2);color:var(--txt);
+  border-radius:6px;padding:5px 10px;font-size:.78rem;font-weight:600;
+  cursor:pointer;outline:none;
+}
+.ctrl-select:focus{border-color:var(--c-trained)}
+
+/* Project search + selector */
+.drill-selector{
+  display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;
+}
+.drill-selector-panel{
+  display:flex;flex-direction:column;gap:0;
+  width:280px;flex-shrink:0;
+  border:1px solid var(--border);border-radius:8px;
+  overflow:hidden;background:var(--surface);
+}
+.drill-search{
+  width:100%;box-sizing:border-box;padding:8px 10px 8px 32px;
+  border:none;border-bottom:1px solid var(--border);
+  font-size:.78rem;background:var(--surface2);color:var(--txt);outline:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:10px center;
+  border-radius:0;
+}
+.drill-search:focus{background:#EFF6FF}
+.drill-proj-box{
+  display:flex;flex-direction:column;gap:0;
+  overflow-y:auto;max-height:220px;
+  padding:4px 0;
+}
+.dp-item{
+  display:flex;align-items:center;gap:8px;cursor:pointer;
+  user-select:none;padding:6px 12px;
+  transition:background .1s;
+}
+.dp-item:hover{background:var(--surface2)}
+.dp-item.all-item{background:var(--surface2);border-bottom:1px solid var(--border);padding:7px 12px}
+.dp-item.all-item:hover{background:#E0EAF8}
+.dp-item input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:#0284C7;flex-shrink:0}
+.dp-item span{font-size:.72rem;font-weight:600;color:var(--txt2);line-height:1.3}
+.dp-item.all-item span{font-weight:700;color:var(--txt)}
+.dp-sep{display:none}
+.dp-none{font-size:.72rem;color:var(--muted);padding:10px 12px}
+.drill-hint{
+  font-size:.68rem;color:var(--muted);padding:4px 12px 6px;
+  border-top:1px solid var(--border);background:var(--surface2);
+  text-align:center;
+}
+@media(max-width:700px){.drill-selector{flex-direction:column}.drill-selector-panel{width:100%}}
+
+.drill-outer{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface)}
+.drill-table{border-collapse:separate;border-spacing:0;table-layout:auto;min-width:100%}
+
+/* Sticky first column */
+.drill-table .metric-col{
+  position:sticky;left:0;z-index:10;background:var(--surface);
+  min-width:170px;max-width:170px;
+  border-right:2px solid var(--border);
+  padding:8px 12px;font-size:.72rem;color:var(--txt2);white-space:nowrap;
+}
+.drill-table thead .metric-col{
+  background:var(--surface2);font-weight:800;font-size:.65rem;text-transform:uppercase;
+  letter-spacing:.07em;color:var(--muted);border-bottom:2px solid var(--border);
+  position:sticky;left:0;top:0;z-index:20;
+}
+.drill-table thead th{
+  background:var(--surface2);border-bottom:2px solid var(--border);
+  padding:8px 12px;min-width:140px;max-width:180px;
+  vertical-align:bottom;
+}
+.proj-head{
+  display:flex;flex-direction:column;gap:4px;
+  font-size:.7rem;font-weight:700;color:var(--txt);
+}
+.proj-head .proj-name{
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  max-width:150px;font-size:.72rem;
+}
+.proj-head .proj-flag{
+  display:inline-flex;align-items:center;gap:4px;font-size:.6rem;font-weight:700;
+  padding:2px 5px;border-radius:3px;color:#fff;width:fit-content;
+}
+.drill-table tbody tr:hover .metric-col,
+.drill-table tbody tr:hover td{background:#F8FBFF}
+.drill-table tbody tr.sort-row .metric-col{background:#EFF6FF}
+.drill-table tbody tr.sort-row td{background:#EFF6FF}
+.drill-table tbody td{
+  padding:7px 12px;border-bottom:1px solid var(--border);vertical-align:middle;
+}
+.cell-inner{display:flex;flex-direction:column;gap:3px}
+.cell-num{font-size:.78rem;font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums;white-space:nowrap}
+.cell-num.zero{color:var(--muted);font-weight:400}
+.cell-bar-wrap{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.cell-bar-fill{height:100%;border-radius:2px;transition:width .3s ease}
+
+/* ── Misc ── */
+.no-data{text-align:center;color:var(--muted);padding:28px;font-size:.82rem}
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;align-items:center;justify-content:center}
+#modal-overlay.open{display:flex}
+#modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;width:min(820px,95vw);max-height:90vh;overflow-y:auto;position:relative;box-shadow:var(--shadow-md)}
+#modal h2{font-size:1rem;margin-bottom:2px;color:var(--txt)}
+#modal .modal-sub{font-size:.72rem;color:var(--muted);margin-bottom:16px}
+#modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--surface2)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div id="header">
+  <div class="logo">
+    <svg viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="34" height="34" rx="8" fill="#0F172A"/>
+      <path d="M7 24L17 8L27 24M9 21H25" stroke="#2DD4BF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="17" cy="26" r="2.5" fill="#FBBF24"/>
+    </svg>
+    <div class="logo-text"><h1>StartHub Africa</h1><span>Impact Dashboard</span></div>
+  </div>
+  <div class="header-filters">
+    <div class="filter-pill"><label>Year</label><select id="filter-year"><option value="all">All Years</option></select></div>
+    <div class="filter-pill"><label>Country</label><select id="filter-country"><option value="all">All Countries</option><option value="Uganda">Uganda</option><option value="Tanzania">Tanzania</option><option value="Kenya">Kenya</option></select></div>
+  </div>
+  <div class="updated">Updated: <span id="updated-date"></span></div>
+</div>
+
+<div id="main">
+
+  <!-- KPI Cards -->
+  <div class="sec-label mb" style="margin-bottom:8px">Key Impact Metrics</div>
+  <div id="kpi-grid" class="mb"></div>
+
+  <!-- Trend Chart -->
+  <div class="sec-label mb" style="margin-bottom:8px">Impact Over Time</div>
+  <div class="chart-card mb">
+    <h3>Year-on-Year Trends</h3>
+    <div class="chart-meta">Select metrics to compare · Click a year bar to see monthly breakdown</div>
+    <div class="mcheck-group" id="trend-checks"></div>
+    <div class="chart-wrap" style="height:280px;margin-top:12px"><canvas id="trend-chart"></canvas></div>
+  </div>
+
+  <!-- Country breakdown -->
+  <div class="sec-label mb" style="margin-bottom:8px">Country Breakdown</div>
+  <div class="charts-2 mb">
+    <div class="chart-card">
+      <h3>Metrics by Country</h3>
+      <div class="chart-meta">Select any metrics to compare across Uganda · Tanzania · Kenya</div>
+      <div class="mcheck-group" id="country-checks"></div>
+      <div id="country-table-wrap" style="margin-top:12px"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Training Share</h3>
+      <div class="chart-meta">Entrepreneurs trained by country</div>
+      <div class="chart-wrap" style="height:260px"><canvas id="donut-chart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Gender Split -->
+  <div class="sec-label mb" style="margin-bottom:8px">Gender Split — Trainings Only</div>
+  <div class="chart-card mb">
+    <h3>Male vs Female Trained by Year</h3>
+    <div class="chart-meta">Gender breakdown applies to entrepreneurship trainings only</div>
+    <div class="chart-wrap" style="height:240px"><canvas id="gender-chart"></canvas></div>
+  </div>
+
+  <!-- Grants Panel -->
+  <div class="sec-label mb" style="margin-bottom:8px">Grants &amp; Funding</div>
+  <div class="chart-card mb">
+    <h3>Grant Value by Project (USD)</h3>
+    <div class="chart-meta">Projects that received grant funding — filtered by selected period &amp; country</div>
+    <div id="grants-wrap" class="chart-wrap" style="height:220px"><canvas id="grants-chart"></canvas></div>
+  </div>
+
+  <!-- Project Drill-Down -->
+  <div class="sec-label mb" style="margin-bottom:8px">Project Drill-Down</div>
+  <div class="chart-card mb">
+    <div class="drill-controls">
+      <div><label>Sort by &nbsp;</label><select class="ctrl-select" id="drill-sort">
+        <option value="trained_total">Trained</option>
+        <option value="tot_total">Training of Trainers</option>
+        <option value="biz_supported">Biz Supported</option>
+        <option value="biz_started">Biz Started</option>
+        <option value="jobs">Jobs Placed</option>
+        <option value="internships">Internships</option>
+        <option value="grants_count">Grants (count)</option>
+        <option value="grants_value">Grants (USD)</option>
+      </select></div>
+      <div><label>Country &nbsp;</label><select class="ctrl-select" id="drill-country">
+        <option value="all">All Countries</option>
+        <option value="Uganda">Uganda</option>
+        <option value="Tanzania">Tanzania</option>
+        <option value="Kenya">Kenya</option>
+      </select></div>
+      <span id="drill-count" style="font-size:.7rem;color:var(--muted);margin-left:4px"></span>
+    </div>
+    <div class="drill-selector">
+      <div class="drill-selector-panel">
+        <input type="search" id="drill-search" class="drill-search" placeholder="Search projects…" autocomplete="off">
+        <div id="drill-proj-box" class="drill-proj-box"></div>
+        <div class="drill-hint" id="drill-hint"></div>
+      </div>
+      <div id="drill-wrap" style="flex:1;min-width:0;overflow-x:auto"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Monthly Modal -->
+<div id="modal-overlay">
+  <div id="modal">
+    <button id="modal-close">✕</button>
+    <h2 id="modal-title"></h2>
+    <div class="modal-sub" id="modal-sub"></div>
+    <div class="chart-wrap" style="height:280px"><canvas id="modal-chart"></canvas></div>
+  </div>
+</div>
+
+<script>
+const DATA = {"updated":"2026-04-23","years":{"2017-19":{"totals":{"trained_m":0,"trained_f":0,"trained_total":600.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"countries":{"Uganda":{"totals":{"trained_m":0,"trained_f":0,"trained_total":600.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]},"Tanzania":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]},"Kenya":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]}},"monthly":{}},"2020":{"totals":{"trained_m":221.0,"trained_f":168.0,"trained_total":489.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":7.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":6.0,"grants_value":1300.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"countries":{"Uganda":{"totals":{"trained_m":221.0,"trained_f":168.0,"trained_total":489.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":7.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":6.0,"grants_value":1300.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[{"name":"SmarterThanCorona Hackathon","country":"Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":100.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Universities - Online Entrepreneurship Academy","country":"Uganda","metrics":{"trained_m":33.0,"trained_f":16.0,"trained_total":49.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":6.0,"grants_value":1300.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"StartHub Catalyzer","country":"Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":7.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Masterclass 1 Ideation","country":"Uganda","metrics":{"trained_m":33.0,"trained_f":18.0,"trained_total":51.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Masterclass 2 Ideation","country":"Uganda","metrics":{"trained_m":48.0,"trained_f":37.0,"trained_total":85.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Masterclass 3 One Page Business Plan","country":"Uganda","metrics":{"trained_m":37.0,"trained_f":35.0,"trained_total":72.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Masterclasses 4 Fundraising","country":"Uganda","metrics":{"trained_m":55.0,"trained_f":27.0,"trained_total":82.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Masterclasses 5 How to get started (female only)","country":"Uganda","metrics":{"trained_m":0.0,"trained_f":20.0,"trained_total":20.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Masterclasses 6 How to tackle break-down as an entrepreneur","country":"Uganda","metrics":{"trained_m":15.0,"trained_f":15.0,"trained_total":30.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Tanzania":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]},"Kenya":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]}},"monthly":{}},"2021":{"totals":{"trained_m":170.0,"trained_f":159.0,"trained_total":349.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":23.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":8.0,"grants_value":30000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"countries":{"Uganda":{"totals":{"trained_m":170.0,"trained_f":159.0,"trained_total":349.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":23.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":8.0,"grants_value":30000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[{"name":"University Academy","country":"Uganda","metrics":{"trained_m":51.0,"trained_f":25.0,"trained_total":76.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Female Founders Bootcamp at Universities","country":"Uganda","metrics":{"trained_m":0,"trained_f":20.0,"trained_total":20.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Ideathons at Universities","country":"Uganda","metrics":{"trained_m":32.0,"trained_f":49.0,"trained_total":81.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Business Recovery Clinics (Online Sessions)","country":"Uganda","metrics":{"trained_m":87.0,"trained_f":65.0,"trained_total":152.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Catalyzer","country":"Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":15.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"DHRLab - Digital Innovations for Business Resilience (Sep 2020 - Dec 2021)","country":"Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":20.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":8.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":8.0,"grants_value":30000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Tanzania":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]},"Kenya":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]}},"monthly":{}},"2022":{"totals":{"trained_m":0,"trained_f":0,"trained_total":1012.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":178.0,"biz_started":0,"jobs":0,"internships":243.0,"grants_count":41.0,"grants_value":54540.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"countries":{"Uganda":{"totals":{"trained_m":0,"trained_f":0,"trained_total":1012.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":178.0,"biz_started":0,"jobs":0,"internships":243.0,"grants_count":41.0,"grants_value":54540.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[{"name":"Nisat - Trainings for SMEs in Agroecology and Ecotourism","country":"Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":60.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":23.0,"grants_value":25000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Digital Innovations for Business Resilience","country":"Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":300.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":120.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":12.0,"grants_value":22000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"JRS Business Trainings","country":"Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":250.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":52.0,"biz_started":0,"jobs":0,"internships":198.0,"grants_count":0,"grants_value":6240.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"University Program (Ideathons, Bootcamp, Pitch-Event)","country":"Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":402.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":6.0,"biz_started":0,"jobs":0,"internships":45.0,"grants_count":6.0,"grants_value":1300.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Tanzania":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]},"Kenya":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]}},"monthly":{}},"2023":{"totals":{"trained_m":194.0,"trained_f":376.0,"trained_total":907.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":253.0,"biz_started":0.0,"jobs":0,"internships":30.0,"grants_count":12.0,"grants_value":78430.0,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":0.0},"countries":{"Uganda":{"totals":{"trained_m":191.0,"trained_f":276.0,"trained_total":804.0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":253.0,"biz_started":0,"jobs":0,"internships":30.0,"grants_count":12.0,"grants_value":78430.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[{"name":"Universities Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":307.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":4.0,"grants_value":2500.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Hi Innovator","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":14.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":3.0,"grants_value":60000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"SheTechs The Future","metrics":{"trained_m":0,"trained_f":32.0,"trained_total":32.0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":11.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Open Innovations Program (OIP)","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":15.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Innovate for Employment (I4E)","metrics":{"trained_m":0,"trained_f":0,"trained_total":30.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":30.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Greenovation","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":6.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":5.0,"grants_value":15930.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Women In Manufacturing","metrics":{"trained_m":0,"trained_f":10.0,"trained_total":10.0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":10.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Empower YOU","metrics":{"trained_m":110.0,"trained_f":87.0,"trained_total":197.0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":197.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"JRS","metrics":{"trained_m":81.0,"trained_f":147.0,"trained_total":228.0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Tanzania":{"totals":{"trained_m":3.0,"trained_f":100.0,"trained_total":103.0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[{"name":"She Techs The future Ideathon + Bootcamp","metrics":{"trained_m":3.0,"trained_f":100.0,"trained_total":103.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":9.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Kenya":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]}},"monthly":{}},"2024":{"totals":{"trained_m":1298.0,"trained_f":1082.0,"trained_total":2380.0,"tot_m":165.0,"tot_f":100.0,"tot_total":265.0,"biz_supported":617.0,"biz_started":42.0,"jobs":104.0,"internships":105.0,"grants_count":35.0,"grants_value":40964.32,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":4.0},"countries":{"Uganda":{"totals":{"trained_m":1075.0,"trained_f":956.0,"trained_total":2031.0,"tot_m":155.0,"tot_f":91.0,"tot_total":246.0,"biz_supported":587.0,"biz_started":34.0,"jobs":104.0,"internships":105.0,"grants_count":15.0,"grants_value":11324.32,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[{"name":"Universities: Future Founders Program","metrics":{"trained_m":10.0,"trained_f":4.0,"trained_total":14.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":1.0,"biz_started":8.0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":5555.56,"cohort_companies":9.0}},{"name":"Universities: Startup 101 - Kabale University","metrics":{"trained_m":21.0,"trained_f":10.0,"trained_total":31.0,"tot_m":4.0,"tot_f":2.0,"tot_total":6.0,"biz_supported":0,"biz_started":10.0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":66.67,"cohort_companies":0}},{"name":"Universities: UCOBS Project 5 - Level 2 Training - MUST","metrics":{"trained_m":14.0,"trained_f":6.0,"trained_total":20.0,"tot_m":3.0,"tot_f":4.0,"tot_total":7.0,"biz_supported":8.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":3.0,"grants_value":405.41,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Universities: CITT - Product Development Training - MUST","metrics":{"trained_m":26.0,"trained_f":7.0,"trained_total":33.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":10.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0.0,"revenue_endline":0,"cohort_companies":0}},{"name":"Catalyzer Startups","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":11.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":8457.0,"revenue_endline":11437.0,"cohort_companies":12.0}},{"name":"Empower YOU","metrics":{"trained_m":202.0,"trained_f":235.0,"trained_total":437.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":56.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":5135.14,"revenue_baseline":55546.0,"revenue_endline":59360.0,"cohort_companies":61.0}},{"name":"I4FS Uganda","metrics":{"trained_m":97.0,"trained_f":59.0,"trained_total":156.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":21.0,"biz_started":7.0,"jobs":0,"internships":0,"grants_count":4.0,"grants_value":810.81,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"I4FS Tanzania","metrics":{"trained_m":86.0,"trained_f":24.0,"trained_total":110.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":25.0,"biz_started":9.0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"I4E","metrics":{"trained_m":19.0,"trained_f":39.0,"trained_total":58.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":41.0,"internships":58.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"WFP Isingiro","metrics":{"trained_m":49.0,"trained_f":89.0,"trained_total":138.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":138.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"WFP Adjumani","metrics":{"trained_m":112.0,"trained_f":191.0,"trained_total":303.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":303.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"KAS (Y4P)","metrics":{"trained_m":6.0,"trained_f":2.0,"trained_total":8.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Stanbic national schools championship","metrics":{"trained_m":171.0,"trained_f":127.0,"trained_total":298.0,"tot_m":85.0,"tot_f":51.0,"tot_total":136.0,"biz_supported":14.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"ILO Online Gig Work Program","metrics":{"trained_m":137.0,"trained_f":81.0,"trained_total":218.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":63.0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0.0,"revenue_endline":3218.0,"cohort_companies":130.0}},{"name":"UNICEF - Internship for Young People","metrics":{"trained_m":21.0,"trained_f":29.0,"trained_total":50.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":47.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"WFP FSQ","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":40.0,"tot_f":23.0,"tot_total":63.0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"WFP Innovation Capacity Training Karamoja","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":9.0,"tot_f":5.0,"tot_total":14.0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Green Growth Agri Hackathon","metrics":{"trained_m":84.0,"trained_f":25.0,"trained_total":109.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":8.0,"grants_value":4972.97,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"WFP Arua","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":14.0,"tot_f":6.0,"tot_total":20.0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"RUFORUM Namibia","metrics":{"trained_m":20.0,"trained_f":28.0,"trained_total":48.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Tanzania":{"totals":{"trained_m":209.0,"trained_f":124.0,"trained_total":333.0,"tot_m":10.0,"tot_f":9.0,"tot_total":19.0,"biz_supported":30.0,"biz_started":6.0,"jobs":0.0,"internships":0.0,"grants_count":20.0,"grants_value":29640.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[{"name":"Startup 101 Cohort 2","metrics":{"trained_m":19.0,"trained_f":8.0,"trained_total":27.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":6.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0.0,"revenue_endline":546000.0,"cohort_companies":6.0}},{"name":"UNDP (#YouthIgnite) Ideathon","metrics":{"trained_m":173.0,"trained_f":103.0,"trained_total":276.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"UNDP (#YouthIgnite) Bootcamp","metrics":{"trained_m":17.0,"trained_f":13.0,"trained_total":30.0,"tot_m":10.0,"tot_f":9.0,"tot_total":19.0,"biz_supported":30.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":20.0,"grants_value":29640.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Kenya":{"totals":{"trained_m":14.0,"trained_f":2.0,"trained_total":16.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0,"biz_started":2.0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[{"name":"0.1% Founders Program","metrics":{"trained_m":14.0,"trained_f":2.0,"trained_total":16.0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":9.0,"biz_started":2.0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":4.0}}]}},"monthly":{}},"2025":{"totals":{"trained_m":1338.0,"trained_f":1024.0,"trained_total":2362.0,"tot_m":190.0,"tot_f":102.0,"tot_total":292.0,"biz_supported":108.0,"biz_started":99.0,"jobs":0.0,"internships":0.0,"grants_count":124.0,"grants_value":97740.0,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":0.0},"countries":{"Uganda":{"totals":{"trained_m":851.0,"trained_f":726.0,"trained_total":1577.0,"tot_m":190.0,"tot_f":102.0,"tot_total":292.0,"biz_supported":96.0,"biz_started":66.0,"jobs":0.0,"internships":0.0,"grants_count":112.0,"grants_value":79740.0,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":0.0},"monthly":{"Jan":{"trained_m":74.0,"trained_f":44.0,"trained_total":118.0,"tot_total":24.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Feb":{"trained_m":50.0,"trained_f":28.0,"trained_total":78.0,"tot_total":12.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Mar":{"trained_m":34.0,"trained_f":34.0,"trained_total":68.0,"tot_total":0.0,"biz_supported":16.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Apr":{"trained_m":26.0,"trained_f":17.0,"trained_total":43.0,"tot_total":174.0,"biz_supported":24.0,"biz_started":56.0,"jobs":0.0,"internships":0.0},"May":{"trained_m":176.0,"trained_f":136.0,"trained_total":312.0,"tot_total":0.0,"biz_supported":15.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jun":{"trained_m":83.0,"trained_f":83.0,"trained_total":166.0,"tot_total":19.0,"biz_supported":19.0,"biz_started":10.0,"jobs":0.0,"internships":0.0},"Jul":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Aug":{"trained_m":12.0,"trained_f":10.0,"trained_total":22.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Sep":{"trained_m":257.0,"trained_f":261.0,"trained_total":518.0,"tot_total":14.0,"biz_supported":3.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Oct":{"trained_m":121.0,"trained_f":94.0,"trained_total":215.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Nov":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":49.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Dec":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0}},"projects":[{"name":"ABED","metrics":{"trained_m":74.0,"trained_f":44.0,"trained_total":118.0,"tot_m":17.0,"tot_f":7.0,"tot_total":24.0,"biz_supported":4.0,"biz_started":17.0,"jobs":0.0,"internships":0.0,"grants_count":5.0,"grants_value":3300.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"MUST Digital Marketing SKills Program","metrics":{"trained_m":25.0,"trained_f":12.0,"trained_total":37.0,"tot_m":8.0,"tot_f":4.0,"tot_total":12.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Innovate 4 Food Security","metrics":{"trained_m":57.0,"trained_f":39.0,"trained_total":96.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":40.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":11.0,"grants_value":3676.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Stanbic National Schools Championship","metrics":{"trained_m":174.0,"trained_f":133.0,"trained_total":307.0,"tot_m":118.0,"tot_f":56.0,"tot_total":174.0,"biz_supported":11.0,"biz_started":38.0,"jobs":0.0,"internships":0.0,"grants_count":11.0,"grants_value":26470.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Empower You","metrics":{"trained_m":225.0,"trained_f":217.0,"trained_total":442.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":19.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":82.0,"grants_value":20294.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"UCU Students Innovation Challenge","metrics":{"trained_m":13.0,"trained_f":9.0,"trained_total":22.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":9.0,"biz_started":1.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Building Bridges GIZ","metrics":{"trained_m":20.0,"trained_f":43.0,"trained_total":63.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"NUTSEP","metrics":{"trained_m":53.0,"trained_f":30.0,"trained_total":83.0,"tot_m":21.0,"tot_f":12.0,"tot_total":33.0,"biz_supported":10.0,"biz_started":10.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Nutrition 4 Business","metrics":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":3.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":3.0,"grants_value":26000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"MUK Environmental Innovations & Technopreneurship","metrics":{"trained_m":18.0,"trained_f":19.0,"trained_total":37.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"UCU SUESCA Ideathons","metrics":{"trained_m":192.0,"trained_f":180.0,"trained_total":372.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"UMU SUESCA - Curriculum Development Workshop","metrics":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_m":26.0,"tot_f":23.0,"tot_total":49.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Tanzania":{"totals":{"trained_m":434.0,"trained_f":266.0,"trained_total":700.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":29.0,"jobs":0.0,"internships":0.0,"grants_count":0.0,"grants_value":0.0,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":0},"monthly":{"Jan":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Feb":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Mar":{"trained_m":23.0,"trained_f":13.0,"trained_total":36.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Apr":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"May":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jun":{"trained_m":273.0,"trained_f":221.0,"trained_total":494.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jul":{"trained_m":115.0,"trained_f":25.0,"trained_total":140.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":29.0,"jobs":0.0,"internships":0.0},"Aug":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Sep":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Oct":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Nov":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Dec":{"trained_m":23.0,"trained_f":7.0,"trained_total":30.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0}},"projects":[{"name":"UNDP Youth Ignite Cohort 2","metrics":{"trained_m":23.0,"trained_f":7.0,"trained_total":30.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"SUA","metrics":{"trained_m":17.0,"trained_f":9.0,"trained_total":26.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"S101","metrics":{"trained_m":121.0,"trained_f":29.0,"trained_total":150.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":29.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"CRDB","metrics":{"trained_m":273.0,"trained_f":221.0,"trained_total":494.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Kenya":{"totals":{"trained_m":53.0,"trained_f":32.0,"trained_total":85.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":12.0,"biz_started":4.0,"jobs":0.0,"internships":0.0,"grants_count":12.0,"grants_value":18000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{"Jan":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Feb":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Mar":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Apr":{"trained_m":12.0,"trained_f":5.0,"trained_total":17.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"May":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jun":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jul":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Aug":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Sep":{"trained_m":41.0,"trained_f":27.0,"trained_total":68.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Oct":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Nov":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Dec":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0}},"projects":[{"name":"Moringa Bootcamp","metrics":{"trained_m":12.0,"trained_f":5.0,"trained_total":17.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Startup 0.1% Founders","metrics":{"trained_m":12.0,"trained_f":5.0,"trained_total":17.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"WFP Peace Building","metrics":{"trained_m":29.0,"trained_f":22.0,"trained_total":51.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":12.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":12.0,"grants_value":18000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]}},"monthly":{"Jan":{"trained_m":74.0,"trained_f":44.0,"trained_total":118.0,"tot_total":24.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Feb":{"trained_m":50.0,"trained_f":28.0,"trained_total":78.0,"tot_total":12.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Mar":{"trained_m":57.0,"trained_f":47.0,"trained_total":104.0,"tot_total":0.0,"biz_supported":16.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Apr":{"trained_m":38.0,"trained_f":22.0,"trained_total":60.0,"tot_total":174.0,"biz_supported":24.0,"biz_started":56.0,"jobs":0.0,"internships":0.0},"May":{"trained_m":176.0,"trained_f":136.0,"trained_total":312.0,"tot_total":0.0,"biz_supported":15.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jun":{"trained_m":356.0,"trained_f":304.0,"trained_total":660.0,"tot_total":19.0,"biz_supported":19.0,"biz_started":10.0,"jobs":0.0,"internships":0.0},"Jul":{"trained_m":115.0,"trained_f":25.0,"trained_total":140.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":29.0,"jobs":0.0,"internships":0.0},"Aug":{"trained_m":12.0,"trained_f":10.0,"trained_total":22.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Sep":{"trained_m":298.0,"trained_f":288.0,"trained_total":586.0,"tot_total":14.0,"biz_supported":3.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Oct":{"trained_m":121.0,"trained_f":94.0,"trained_total":215.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Nov":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":49.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Dec":{"trained_m":23.0,"trained_f":7.0,"trained_total":30.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0}}},"2026":{"totals":{"trained_m":224.0,"trained_f":308.0,"trained_total":532.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":61.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":41.0,"grants_value":100097.09,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":37.0},"countries":{"Uganda":{"totals":{"trained_m":224.0,"trained_f":308.0,"trained_total":532.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":61.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":18.0,"grants_value":70000.0,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":37.0},"monthly":{"Jan":{"trained_m":212.0,"trained_f":283.0,"trained_total":495.0,"tot_total":0.0,"biz_supported":18.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Feb":{"trained_m":12.0,"trained_f":25.0,"trained_total":37.0,"tot_total":0.0,"biz_supported":24.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Mar":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Apr":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"May":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jun":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jul":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Aug":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Sep":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Oct":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Nov":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Dec":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0}},"projects":[{"name":"WeWork","metrics":{"trained_m":12.0,"trained_f":25.0,"trained_total":37.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":24.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"WFP BDS Katakwi","metrics":{"trained_m":212.0,"trained_f":283.0,"trained_total":495.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":18.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":18.0,"grants_value":70000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":37.0}}]},"Tanzania":{"totals":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":23.0,"grants_value":30097.09,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{"Jan":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Feb":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Mar":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Apr":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"May":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jun":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jul":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Aug":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Sep":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Oct":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Nov":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Dec":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0}},"projects":[{"name":"YouthIgnite Cohort 2","metrics":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":20.0,"grants_value":29514.56,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"S101 Cohort 3","metrics":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":3.0,"grants_value":582.52,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Kenya":{"totals":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0.0,"grants_value":0.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{"Jan":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Feb":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Mar":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Apr":{"trained_m":0.0,"trained_f":0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"May":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jun":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jul":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Aug":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Sep":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Oct":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Nov":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Dec":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0}},"projects":[]}},"monthly":{"Jan":{"trained_m":212.0,"trained_f":283.0,"trained_total":495.0,"tot_total":0.0,"biz_supported":18.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Feb":{"trained_m":12.0,"trained_f":25.0,"trained_total":37.0,"tot_total":0.0,"biz_supported":24.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Mar":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Apr":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"May":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jun":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jul":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Aug":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Sep":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Oct":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Nov":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Dec":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0}}}},"overall":{"all":{"trained_m":3445.0,"trained_f":3117.0,"trained_total":8631.0,"tot_m":355.0,"tot_f":202.0,"tot_total":557.0,"biz_supported":1247.0,"biz_started":141.0,"jobs":104.0,"internships":378.0,"grants_count":267.0,"grants_value":403071.41000000003,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":41.0},"countries":{"Uganda":{"trained_m":2732.0,"trained_f":2593.0,"trained_total":7394.0,"tot_m":345.0,"tot_f":193.0,"tot_total":538.0,"biz_supported":1205.0,"biz_started":100.0,"jobs":104.0,"internships":378.0,"grants_count":212.0,"grants_value":325334.32,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":37.0},"Tanzania":{"trained_m":646.0,"trained_f":490.0,"trained_total":1136.0,"tot_m":10.0,"tot_f":9.0,"tot_total":19.0,"biz_supported":30.0,"biz_started":35.0,"jobs":0.0,"internships":0.0,"grants_count":43.0,"grants_value":59737.09,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":0},"Kenya":{"trained_m":67.0,"trained_f":34.0,"trained_total":101.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":12.0,"biz_started":6.0,"jobs":0.0,"internships":0.0,"grants_count":12.0,"grants_value":18000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}}};
+
+// ── Config ─────────────────────────────────────────────────────────────────
+const METRICS = [
+  {key:'trained_total', label:'Trained',             icon:'🎓', color:'#0284C7', prefix:''},
+  {key:'tot_total',     label:'Training of Trainers',icon:'📚', color:'#7C3AED', prefix:''},
+  {key:'biz_supported', label:'Biz Supported',       icon:'🏢', color:'#B45309', prefix:''},
+  {key:'biz_started',   label:'Biz Started',         icon:'🚀', color:'#059669', prefix:''},
+  {key:'jobs',          label:'Jobs Placed',          icon:'💼', color:'#DC2626', prefix:''},
+  {key:'internships',   label:'Internships',          icon:'📋', color:'#2563EB', prefix:''},
+  {key:'grants_count',  label:'Grants (count)',       icon:'🏷️', color:'#BE185D', prefix:''},
+  {key:'grants_value',  label:'Grants (USD)',         icon:'💰', color:'#EA580C', prefix:'$'},
+];
+const METRIC_MAP = Object.fromEntries(METRICS.map(m=>[m.key,m]));
+
+const COUNTRY_COLORS = {Uganda:'#0891B2', Tanzania:'#D97706', Kenya:'#DC2626'};
+const COUNTRY_BG     = {Uganda:'#E0F7FA', Tanzania:'#FFF8E1', Kenya:'#FFEBEE'};
+const COUNTRIES = ['Uganda','Tanzania','Kenya'];
+
+// Pastel palette for project columns
+const PROJ_BG = [
+  '#DBEAFE','#D1FAE5','#FEF3C7','#FCE7F3','#EDE9FE',
+  '#FFEDD5','#E0F2FE','#F0FDF4','#FFF7ED','#FDF4FF',
+  '#ECFDF5','#EFF6FF','#FFF1F2','#F0F9FF','#FEFCE8',
+  '#E0E7FF','#FFE4E6','#CFFAFE','#F7FEE7','#FEF9C3',
+];
+const PROJ_BORDER = [
+  '#93C5FD','#6EE7B7','#FCD34D','#F9A8D4','#C4B5FD',
+  '#FDBA74','#7DD3FC','#86EFAC','#FED7AA','#E879F9',
+  '#6EE7B7','#BFDBFE','#FECDD3','#BAE6FD','#FDE047',
+  '#A5B4FC','#FDA4AF','#67E8F9','#BEF264','#FEF08A',
+];
+
+// ── State ──────────────────────────────────────────────────────────────────
+const state = {
+  year:'all', country:'all',
+  activeMetrics: METRICS.map(m=>m.key),
+  countryMetrics: METRICS.map(m=>m.key),
+  drillSort:'trained_total', drillCountry:'all',
+  drillSearch:'', drillSelected:null,   // null = all selected
+};
+
+let charts = {};
+let modalChart = null;
+
+// ── Data helpers ───────────────────────────────────────────────────────────
+const getYears = () => Object.keys(DATA.years).sort();
+
+function getMetrics(yr, country){
+  const d = DATA.years[yr]; if(!d) return null;
+  if(country==='all') return d.totals;
+  return d.countries?.[country]?.totals || null;
+}
+
+function getFiltered(){
+  if(state.year==='all'){
+    if(state.country==='all') return DATA.overall.all||{};
+    return DATA.overall.countries?.[state.country]||{};
+  }
+  return getMetrics(state.year, state.country)||{};
+}
+
+function fmt(v, prefix=''){
+  if(!v||v===0) return '—';
+  const n = Math.round(v);
+  if(n>=1000000) return prefix+(n/1000000).toFixed(1)+'M';
+  if(n>=10000)   return prefix+(n/1000).toFixed(0)+'K';
+  if(n>=1000)    return prefix+(n/1000).toFixed(1)+'K';
+  return prefix+n.toLocaleString();
+}
+function fmtFull(v, prefix=''){
+  if(!v||v===0) return '—';
+  return prefix+Math.round(v).toLocaleString();
+}
+function pct(a,b){ return b>0?Math.round(a/b*100):0; }
+
+function normName(n){ return (n||'').trim().replace(/\s+/g,' '); }
+
+function getProjects(drillCountry){
+  const years = state.year==='all'?getYears():[state.year];
+  const map = {};   // key → entry
+  const display = {}; // key → canonical display name
+  for(const yr of years){
+    const yd = DATA.years[yr]; if(!yd) continue;
+    for(const c of COUNTRIES){
+      if(drillCountry!=='all'&&c!==drillCountry) continue;
+      for(const p of (yd.countries?.[c]?.projects||[])){
+        // normalise key: lowercase + trim → merges capitalisation variants
+        const key = normName(p.name).toLowerCase()+'||'+c;
+        if(map[key]){
+          Object.keys(p.metrics||{}).forEach(k=>{
+            map[key].metrics[k]=(map[key].metrics[k]||0)+(p.metrics[k]||0);
+          });
+        } else {
+          // prefer the title-cased / capitalised variant as display name
+          const raw = normName(p.name);
+          const titled = raw.replace(/\w/g,ch=>ch.toUpperCase());
+          display[key] = titled;
+          map[key]={name:titled,country:c,metrics:{...(p.metrics||{})}};
+        }
+      }
+    }
+  }
+  return Object.values(map);
+}
+
+// ── KPI Cards ─────────────────────────────────────────────────────────────
+function renderKPI(){
+  const m = getFiltered();
+  const rows = METRICS.map(met=>{
+    const v = m[met.key]||0;
+    let sub = '';
+    if(met.key==='trained_total'){
+      const tm=m.trained_m||0, tf=m.trained_f||0;
+      if(tm||tf) sub=`<span class="badge badge-m">♂ ${fmtFull(tm)}</span><span class="badge badge-f">♀ ${fmtFull(tf)}</span>`;
+    }
+    if(met.key==='tot_total'){
+      const tm=m.tot_m||0, tf=m.tot_f||0;
+      if(tm||tf) sub=`<span class="badge badge-m">♂ ${fmtFull(tm)}</span><span class="badge badge-f">♀ ${fmtFull(tf)}</span>`;
+    }
+    if(met.key==='grants_value'){
+      sub=`<span style="color:var(--muted)">${m.grants_count||0} grants awarded</span>`;
+    }
+    return `<div class="kpi" style="--accent:${met.color}">
+      <div class="kpi-label">${met.icon} ${met.label}</div>
+      <div class="kpi-value">${fmt(v,met.prefix)}</div>
+      ${sub?`<div class="kpi-sub">${sub}</div>`:''}
+    </div>`;
+  });
+  document.getElementById('kpi-grid').innerHTML = rows.join('');
+}
+
+// ── Checkbox group builder (reusable) ────────────────────────────────────────
+function buildCheckGroup(containerId, stateKey, onChangeFn){
+  const wrap = document.getElementById(containerId);
+  const allChecked = () => state[stateKey].length === METRICS.length;
+
+  wrap.innerHTML = `
+    <label class="mcheck-item all-item">
+      <input type="checkbox" id="${containerId}-all" ${allChecked()?'checked':''}>
+      <span>Select All</span>
+    </label>
+    <div class="mcheck-sep"></div>
+    ${METRICS.map(m=>`
+      <label class="mcheck-item" style="--chk-col:${m.color}">
+        <input type="checkbox" data-mk="${m.key}" ${state[stateKey].includes(m.key)?'checked':''}>
+        <span>${m.icon} ${m.label}</span>
+      </label>`).join('')}`;
+
+  // "Select All" checkbox
+  const allBox = wrap.querySelector(`#${containerId}-all`);
+  allBox.addEventListener('change', ()=>{
+    state[stateKey] = allBox.checked ? METRICS.map(m=>m.key) : [];
+    buildCheckGroup(containerId, stateKey, onChangeFn);
+    onChangeFn();
+  });
+
+  // Individual checkboxes
+  wrap.querySelectorAll('input[data-mk]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      if(inp.checked){
+        if(!state[stateKey].includes(inp.dataset.mk)) state[stateKey].push(inp.dataset.mk);
+      } else {
+        state[stateKey] = state[stateKey].filter(k=>k!==inp.dataset.mk);
+      }
+      // Sync "Select All" state
+      allBox.checked = state[stateKey].length === METRICS.length;
+      allBox.indeterminate = state[stateKey].length > 0 && state[stateKey].length < METRICS.length;
+      onChangeFn();
+    });
+  });
+
+  // Set indeterminate on load if partial
+  allBox.indeterminate = state[stateKey].length > 0 && state[stateKey].length < METRICS.length;
+}
+
+// ── Trend Chart ─────────────────────────────────────────────────────────────
+function renderTrendChecks(){
+  buildCheckGroup('trend-checks', 'activeMetrics', updateTrend);
+}
+
+function buildTrendDatasets(){
+  const years = getYears();
+  return {
+    labels: years,
+    datasets: METRICS.filter(m=>state.activeMetrics.includes(m.key)).map(m=>{
+      const vals = years.map(yr=>{const mm=getMetrics(yr,state.country);return mm?mm[m.key]||0:0;});
+      return {
+        label:m.label, data:vals,
+        borderColor:m.color, backgroundColor:m.color+'22',
+        borderWidth:2.5, pointRadius:4, pointHoverRadius:7,
+        fill:false, tension:0.3,
+        yAxisID: m.key==='grants_value'?'y2':'y1'
+      };
+    })
+  };
+}
+
+function initTrend(){
+  const ctx = document.getElementById('trend-chart');
+  charts.trend = new Chart(ctx,{
+    type:'line', data:buildTrendDatasets(),
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      onClick:(e,els)=>{ if(els.length) openModal(getYears()[els[0].index]); },
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'#1E293B',borderColor:'#334155',borderWidth:1,
+          titleColor:'#F1F5F9',bodyColor:'#94A3B8',padding:10,
+          callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y?.toLocaleString?.()??c.parsed.y}`}
+        }
+      },
+      scales:{
+        x:{grid:{color:'#F1F5F9'},ticks:{color:'#64748B'}},
+        y1:{position:'left',grid:{color:'#F1F5F9'},ticks:{color:'#64748B',callback:v=>v>=1000?v/1000+'K':v}},
+        y2:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#64748B',callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v)}}
+      }
+    }
+  });
+}
+
+function updateTrend(){
+  if(!charts.trend) return;
+  charts.trend.data = buildTrendDatasets();
+  charts.trend.update('active');
+}
+
+// ── Donut Chart ─────────────────────────────────────────────────────────────
+function renderDonut(){
+  const yrs = state.year==='all'?getYears():[state.year];
+  const vals = COUNTRIES.map(c=>yrs.reduce((s,yr)=>{const m=getMetrics(yr,c);return s+(m?.trained_total||0);},0));
+  const ctx = document.getElementById('donut-chart');
+  if(charts.donut) charts.donut.destroy();
+  charts.donut = new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:COUNTRIES,datasets:[{
+      data:vals, backgroundColor:COUNTRIES.map(c=>COUNTRY_BG[c]),
+      borderColor:COUNTRIES.map(c=>COUNTRY_COLORS[c]), borderWidth:2, hoverOffset:8
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,cutout:'62%',
+      plugins:{
+        legend:{position:'bottom',labels:{color:'#64748B',font:{size:11},padding:14,usePointStyle:true}},
+        tooltip:{
+          backgroundColor:'#1E293B',borderColor:'#334155',borderWidth:1,
+          callbacks:{label:c=>`${c.label}: ${c.parsed.toLocaleString()} (${pct(c.parsed,vals.reduce((a,b)=>a+b,0))}%)`}
+        }
+      }
+    }
+  });
+}
+
+// ── Country Metrics Checks ────────────────────────────────────────────────────
+function renderCountryChecks(){
+  buildCheckGroup('country-checks', 'countryMetrics', renderCountryTable);
+}
+
+// ── Country Metrics Table ────────────────────────────────────────────────────
+function renderCountryTable(){
+  const yrs = state.year==='all'?getYears():[state.year];
+  const cData = {};
+  for(const c of COUNTRIES){
+    const tot = blank();
+    for(const yr of yrs){
+      const m=getMetrics(yr,c)||{};
+      Object.keys(tot).forEach(k=>tot[k]+=(m[k]||0));
+    }
+    cData[c]=tot;
+  }
+
+  const visibleMetrics = METRICS.filter(m=>state.countryMetrics.includes(m.key));
+
+  // Max per metric across countries
+  const maxes = {};
+  visibleMetrics.forEach(met=>{
+    maxes[met.key]=Math.max(...COUNTRIES.map(c=>cData[c][met.key]||0),1);
+  });
+
+  let html=`<div style="overflow-x:auto"><table class="country-metrics-table">
+    <thead><tr>
+      <th style="min-width:160px">Metric</th>
+      ${COUNTRIES.map(c=>`<th style="min-width:140px"><div class="country-col-head">
+        <span class="c-badge" style="background:${COUNTRY_COLORS[c]}">${c.substring(0,2).toUpperCase()}</span>${c}
+      </div></th>`).join('')}
+    </tr></thead>
+    <tbody>`;
+
+  for(const met of visibleMetrics){
+    html+=`<tr><td class="metric-col" style="position:unset;border-right:none;max-width:none">${met.icon} ${met.label}</td>`;
+    for(const c of COUNTRIES){
+      const v=cData[c][met.key]||0;
+      const barW=Math.round(v/maxes[met.key]*100);
+      html+=`<td>
+        <div class="metric-bar-cell">
+          <span class="num-cell" style="min-width:60px">${fmtFull(v,met.prefix)}</span>
+          ${v>0?`<div style="flex:1;background:var(--border);border-radius:2px;height:5px">
+            <div style="width:${barW}%;height:100%;background:${COUNTRY_COLORS[c]};border-radius:2px"></div>
+          </div>`:''}
+        </div>
+      </td>`;
+    }
+    html+=`</tr>`;
+  }
+  html+=`</tbody></table></div>`;
+  document.getElementById('country-table-wrap').innerHTML = html;
+}
+
+function blank(){ return Object.fromEntries(METRICS.map(m=>[m.key,0])); }
+
+// ── Gender Chart ─────────────────────────────────────────────────────────────
+function renderGender(){
+  const years = getYears();
+  const mVals = years.map(yr=>{const m=getMetrics(yr,state.country);return m?.trained_m||0;});
+  const fVals = years.map(yr=>{const m=getMetrics(yr,state.country);return m?.trained_f||0;});
+  const ctx = document.getElementById('gender-chart');
+  if(charts.gender) charts.gender.destroy();
+  charts.gender = new Chart(ctx,{
+    type:'bar',
+    data:{labels:years,datasets:[
+      {label:'Male',data:mVals,backgroundColor:'#BFDBFE',borderColor:'#3B82F6',borderWidth:1,borderRadius:3,stack:'g'},
+      {label:'Female',data:fVals,backgroundColor:'#FBCFE8',borderColor:'#EC4899',borderWidth:1,borderRadius:3,stack:'g'},
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'top',labels:{color:'#64748B',font:{size:11},usePointStyle:true}},
+        tooltip:{backgroundColor:'#1E293B',borderColor:'#334155',borderWidth:1,
+          callbacks:{afterBody:items=>{const t=items.reduce((s,i)=>s+i.parsed.y,0);return t?[`Total: ${t.toLocaleString()}`]:[];}}
+        }
+      },
+      scales:{
+        x:{stacked:true,grid:{color:'#F1F5F9'},ticks:{color:'#64748B'}},
+        y:{stacked:true,grid:{color:'#F1F5F9'},ticks:{color:'#64748B',callback:v=>v>=1000?v/1000+'K':v}}
+      }
+    }
+  });
+}
+
+// ── Grants Chart ─────────────────────────────────────────────────────────────
+function renderGrants(){
+  const ps = getProjects(state.country).filter(p=>(p.metrics.grants_value||0)>0)
+    .sort((a,b)=>(b.metrics.grants_value||0)-(a.metrics.grants_value||0)).slice(0,14);
+  const wrap = document.getElementById('grants-wrap');
+  if(!ps.length){ wrap.innerHTML='<div class="no-data">No grant data for selected filters</div>'; if(charts.grants)charts.grants.destroy(); return; }
+  if(!wrap.querySelector('canvas')){ wrap.innerHTML='<canvas id="grants-chart"></canvas>'; }
+  const ctx = document.getElementById('grants-chart');
+  if(charts.grants) charts.grants.destroy();
+  charts.grants = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:ps.map(p=>p.name.length>35?p.name.slice(0,35)+'…':p.name),
+      datasets:[{
+        label:'Grant Value (USD)',
+        data:ps.map(p=>p.metrics.grants_value||0),
+        backgroundColor:ps.map(p=>COUNTRY_BG[p.country]),
+        borderColor:ps.map(p=>COUNTRY_COLORS[p.country]),
+        borderWidth:1.5,borderRadius:4
+      }]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{backgroundColor:'#1E293B',borderColor:'#334155',borderWidth:1,
+          callbacks:{label:c=>`USD ${Math.round(c.parsed.x).toLocaleString()} · ${ps[c.dataIndex].country}`}
+        }
+      },
+      scales:{
+        x:{grid:{color:'#F1F5F9'},ticks:{color:'#64748B',callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v)}},
+        y:{grid:{display:false},ticks:{color:'#64748B',font:{size:11}}}
+      }
+    }
+  });
+}
+
+// ── Project Selector ──────────────────────────────────────────────────────────
+function renderDrillSelector(projects){
+  const q = state.drillSearch.toLowerCase().trim();
+  const visible = q
+    ? projects.filter(p=>p.name.toLowerCase().includes(q)||p.country.toLowerCase().includes(q))
+    : projects;
+  const allKeys = projects.map(p=>p.name+'||'+p.country);
+  const sel = state.drillSelected || new Set(allKeys);
+  const box = document.getElementById('drill-proj-box');
+  const hint = document.getElementById('drill-hint');
+  if(!box) return;
+
+  if(!visible.length){
+    box.innerHTML = '<span class="dp-none">No projects match.</span>';
+    if(hint) hint.textContent='';
+    return;
+  }
+
+  const visKeys = visible.map(p=>p.name+'||'+p.country);
+  const selCount = visKeys.filter(k=>sel.has(k)).length;
+  const allChecked = selCount===visKeys.length;
+  const noneChecked = selCount===0;
+
+  // Build rows
+  let h = `<label class="dp-item all-item"><input type="checkbox" id="dp-all"${allChecked?' checked':''}>`+
+          `<span>Select All (${visible.length})</span></label>`;
+  for(const p of visible){
+    const k = p.name+'||'+p.country;
+    const checked = sel.has(k);
+    const flag = p.country.substring(0,2).toUpperCase();
+    h+=`<label class="dp-item"><input type="checkbox" class="dp-cb" data-key="${k}"${checked?' checked':''}>`+
+       `<span title="${p.name}">${p.name}<em style="color:var(--muted);font-style:normal;font-size:.65rem;margin-left:4px">[${flag}]</em></span></label>`;
+  }
+  box.innerHTML = h;
+
+  // Hint counter
+  const totalSel = allKeys.filter(k=>sel.has(k)).length;
+  if(hint) hint.textContent = totalSel===allKeys.length
+    ? `All ${allKeys.length} projects shown`
+    : `${totalSel} of ${allKeys.length} selected`;
+
+  // Select All wiring
+  const allBox = box.querySelector('#dp-all');
+  allBox.indeterminate = !noneChecked && !allChecked;
+  allBox.addEventListener('change',()=>{
+    const cur = state.drillSelected ? new Set(state.drillSelected) : new Set(allKeys);
+    if(allBox.checked) visKeys.forEach(k=>cur.add(k));
+    else visKeys.forEach(k=>cur.delete(k));
+    state.drillSelected = cur.size===allKeys.length ? null : cur;
+    renderDrillSelector(projects);
+    renderDrillDown(projects);
+  });
+
+  // Individual checkbox wiring
+  box.querySelectorAll('.dp-cb').forEach(cb=>{
+    cb.addEventListener('change',()=>{
+      const cur = state.drillSelected ? new Set(state.drillSelected) : new Set(allKeys);
+      if(cb.checked) cur.add(cb.dataset.key);
+      else cur.delete(cb.dataset.key);
+      state.drillSelected = cur.size===allKeys.length ? null : cur;
+      renderDrillSelector(projects);
+      renderDrillDown(projects);
+    });
+  });
+}
+
+// ── Project Drill-Down (column-centric) ────────────────────────────────────
+const DRILL_METRICS = METRICS; // all 8 metrics as rows
+
+function renderDrillDown(prebuilt){
+  const dc = state.drillCountry;
+  // prebuilt passed from renderDrillSelector to avoid recompute
+  let allProjects = prebuilt || (() => {
+    const p = getProjects(dc);
+    const sk = state.drillSort;
+    p.sort((a,b)=>(b.metrics[sk]||0)-(a.metrics[sk]||0));
+    return p;
+  })();
+
+  const sortKey = state.drillSort;
+  if(!prebuilt) allProjects.sort((a,b)=>(b.metrics[sortKey]||0)-(a.metrics[sortKey]||0));
+
+  // Apply selection filter
+  let projects;
+  if(state.drillSelected && state.drillSelected.size > 0){
+    projects = allProjects.filter(p=>state.drillSelected.has(p.name+'||'+p.country));
+  } else {
+    projects = allProjects;
+  }
+  const top = projects.slice(0,25);
+
+  document.getElementById('drill-count').textContent =
+    state.drillSelected
+      ? `${top.length} selected of ${allProjects.length} projects`
+      : `${top.length} of ${allProjects.length} projects`;
+
+  if(!top.length){
+    document.getElementById('drill-wrap').innerHTML='<div class="no-data">No project data for selected filters.</div>';
+    return;
+  }
+
+  // Max per metric for bar widths
+  const maxVals = {};
+  DRILL_METRICS.forEach(m=>{
+    maxVals[m.key] = Math.max(...top.map(p=>p.metrics[m.key]||0),1);
+  });
+
+  let html=`<div class="drill-outer"><table class="drill-table">
+    <thead><tr>
+      <th class="metric-col">Metric / Project →</th>
+      ${top.map((p,i)=>{
+        const bg=PROJ_BG[i%PROJ_BG.length];
+        const bd=PROJ_BORDER[i%PROJ_BORDER.length];
+        const cc=COUNTRY_COLORS[p.country];
+        return `<th style="background:${bg};border-bottom:2px solid ${bd}">
+          <div class="proj-head">
+            <span class="proj-flag" style="background:${cc}">${p.country.substring(0,2).toUpperCase()}</span>
+            <span class="proj-name" title="${p.name}">${p.name}</span>
+          </div>
+        </th>`;
+      }).join('')}
+    </tr></thead>
+    <tbody>`;
+
+  for(const met of DRILL_METRICS){
+    const isSorted = met.key===sortKey;
+    html+=`<tr class="${isSorted?'sort-row':''}">
+      <td class="metric-col" style="font-weight:${isSorted?'800':'600'};color:${isSorted?met.color:'#334155'}">
+        ${met.icon} ${met.label}${isSorted?' ▲':''}
+      </td>`;
+    for(let i=0;i<top.length;i++){
+      const p=top[i];
+      const v=p.metrics[met.key]||0;
+      const barW=v>0?Math.round(v/maxVals[met.key]*100):0;
+      const bd=PROJ_BORDER[i%PROJ_BORDER.length];
+      const display = v===0?'<span class="cell-num zero">—</span>'
+        :`<span class="cell-num">${met.prefix}${Math.round(v).toLocaleString()}</span>`;
+      html+=`<td>
+        <div class="cell-inner">
+          ${display}
+          ${v>0?`<div class="cell-bar-wrap"><div class="cell-bar-fill" style="width:${barW}%;background:${bd}"></div></div>`:''}
+        </div>
+      </td>`;
+    }
+    html+=`</tr>`;
+  }
+
+  html+=`</tbody></table></div>`;
+  document.getElementById('drill-wrap').innerHTML = html;
+}
+
+// ── Monthly Modal ─────────────────────────────────────────────────────────────
+function openModal(yr){
+  const yd=DATA.years[yr];
+  if(!yd?.monthly||!Object.keys(yd.monthly).length){ alert(`Monthly data not available for ${yr}`); return; }
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const c=state.country;
+  const getV=(m,k)=>{
+    if(c!=='all'&&yd.countries?.[c]?.monthly?.[m]) return yd.countries[c].monthly[m][k]||0;
+    return yd.monthly?.[m]?.[k]||0;
+  };
+  document.getElementById('modal-title').textContent=`Monthly Breakdown — ${yr}`;
+  document.getElementById('modal-sub').textContent=`${c==='all'?'All Countries':c} · Click outside to close`;
+  document.getElementById('modal-overlay').classList.add('open');
+  const ctx=document.getElementById('modal-chart');
+  if(modalChart)modalChart.destroy();
+  modalChart=new Chart(ctx,{
+    type:'bar',
+    data:{labels:months,datasets:[
+      {label:'Trained',data:months.map(m=>getV(m,'trained_total')),backgroundColor:'#BFDBFE',borderColor:'#3B82F6',borderWidth:1,borderRadius:3},
+      {label:'ToT',data:months.map(m=>getV(m,'tot_total')),backgroundColor:'#DDD6FE',borderColor:'#8B5CF6',borderWidth:1,borderRadius:3},
+      {label:'Biz Supported',data:months.map(m=>getV(m,'biz_supported')),backgroundColor:'#FDE68A',borderColor:'#F59E0B',borderWidth:1,borderRadius:3},
+      {label:'Jobs',data:months.map(m=>getV(m,'jobs')),backgroundColor:'#FECACA',borderColor:'#EF4444',borderWidth:1,borderRadius:3},
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{color:'#64748B',font:{size:11}}},tooltip:{backgroundColor:'#1E293B',borderColor:'#334155',borderWidth:1}},
+      scales:{
+        x:{grid:{color:'#F1F5F9'},ticks:{color:'#64748B'}},
+        y:{grid:{color:'#F1F5F9'},ticks:{color:'#64748B'}}
+      }
+    }
+  });
+}
+
+// ── Init & Wiring ─────────────────────────────────────────────────────────────
+function renderDrill(){
+  const dc = state.drillCountry;
+  const allP = getProjects(dc);
+  allP.sort((a,b)=>(b.metrics[state.drillSort]||0)-(a.metrics[state.drillSort]||0));
+  // reset selection when filters change (year/country/drillCountry)
+  state.drillSelected = null;
+  state.drillSearch = '';
+  const si = document.getElementById('drill-search');
+  if(si) si.value='';
+  renderDrillSelector(allP);
+  renderDrillDown(allP);
+}
+
+function renderAll(){
+  renderKPI();
+  updateTrend();
+  renderDonut();
+  renderCountryTable();
+  renderGender();
+  renderGrants();
+  renderDrill();
+}
+
+function init(){
+  document.getElementById('updated-date').textContent=DATA.updated;
+
+  // Year filter
+  const sel=document.getElementById('filter-year');
+  getYears().forEach(yr=>{ const o=document.createElement('option'); o.value=yr; o.textContent=yr; sel.appendChild(o); });
+  sel.addEventListener('change',e=>{ state.year=e.target.value; renderAll(); });
+  document.getElementById('filter-country').addEventListener('change',e=>{ state.country=e.target.value; renderAll(); });
+
+  // Drill-down controls
+  document.getElementById('drill-sort').addEventListener('change',e=>{ state.drillSort=e.target.value; renderDrill(); });
+  document.getElementById('drill-country').addEventListener('change',e=>{ state.drillCountry=e.target.value; renderDrill(); });
+
+  // Drill search
+  document.getElementById('drill-search').addEventListener('input',e=>{
+    state.drillSearch=e.target.value;
+    const dc = state.drillCountry;
+    const allP = getProjects(dc);
+    allP.sort((a,b)=>(b.metrics[state.drillSort]||0)-(a.metrics[state.drillSort]||0));
+    renderDrillSelector(allP);
+    // don't reset selection or re-render the full table when just typing
+  });
+
+  // Modal
+  document.getElementById('modal-close').addEventListener('click',()=>document.getElementById('modal-overlay').classList.remove('open'));
+  document.getElementById('modal-overlay').addEventListener('click',e=>{ if(e.target.id==='modal-overlay') document.getElementById('modal-overlay').classList.remove('open'); });
+
+  // Charts
+  renderTrendChecks();
+  renderCountryChecks();
+  initTrend();
+  renderKPI();
+  renderDonut();
+  renderCountryTable();
+  renderGender();
+  renderGrants();
+  renderDrill();
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
