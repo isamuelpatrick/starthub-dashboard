@@ -348,11 +348,14 @@ def generate_html(data):
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>StartHub Africa — Impact Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
 :root{{
-  --bg:#F0F4F8;
+  --bg:#EEF2F6;
   --surface:#FFFFFF;
   --surface2:#F8FAFC;
   --border:#E2E8F0;
@@ -363,47 +366,51 @@ def generate_html(data):
   --shadow:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
   --shadow-md:0 4px 12px rgba(0,0,0,.06),0 2px 4px rgba(0,0,0,.04);
   --radius:10px;
-  /* Metric accent colours */
-  --c-trained:#0284C7;
-  --c-tot:#7C3AED;
-  --c-biz-sup:#B45309;
-  --c-biz-sta:#059669;
-  --c-jobs:#DC2626;
-  --c-intern:#2563EB;
-  --c-grants-n:#BE185D;
-  --c-grants-v:#EA580C;
+  /* Brand primary colours — StartHub Africa Style Guide */
+  --brand-navy:#243649;
+  --brand-blue:#32579F;
+  --brand-gold:#DFA12C;
+  /* Metric accent colours — thematic lineup from brand palette */
+  --c-trained:#243649;
+  --c-tot:#32579F;
+  --c-biz-sup:#DFA12C;
+  --c-biz-sta:#2D6B2A;
+  --c-jobs:#7A1E2E;
+  --c-intern:#3E6B8A;
+  --c-grants-n:#5B9BC4;
+  --c-grants-v:#E8B84B;
   /* Country colours */
-  --uganda:#0891B2;
-  --tanzania:#D97706;
-  --kenya:#DC2626;
+  --uganda:#243649;
+  --tanzania:#DFA12C;
+  --kenya:#32579F;
 }}
 html{{font-size:14px;color-scheme:light}}
-body{{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}}
+body{{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif;min-height:100vh}}
 
 /* ── Header ── */
 #header{{
-  background:var(--surface);border-bottom:1px solid var(--border);
+  background:var(--brand-navy);border-bottom:3px solid var(--brand-gold);
   padding:12px 24px;display:flex;align-items:center;gap:16px;
   position:sticky;top:0;z-index:200;flex-wrap:wrap;
-  box-shadow:var(--shadow);
+  box-shadow:0 2px 12px rgba(36,54,73,.35);
 }}
 .logo{{display:flex;align-items:center;gap:10px;flex:1;min-width:180px}}
-.logo svg{{width:34px;height:34px}}
-.logo-text h1{{font-size:1rem;font-weight:800;color:var(--txt);line-height:1}}
-.logo-text span{{font-size:.68rem;color:var(--muted)}}
+.logo svg{{width:36px;height:36px}}
+.logo-text h1{{font-size:1rem;font-weight:800;color:#FFFFFF;line-height:1;letter-spacing:-.01em}}
+.logo-text span{{font-size:.68rem;color:rgba(255,255,255,.55);letter-spacing:.02em}}
 .header-filters{{display:flex;gap:8px;flex-wrap:wrap;align-items:center}}
 
 /* Filter dropdown pills */
 .filter-dd{{
   position:relative;display:flex;align-items:center;gap:6px;
-  background:var(--surface2);border:1px solid var(--border2);border-radius:6px;
+  background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.20);border-radius:6px;
   padding:5px 10px;cursor:pointer;user-select:none;
   transition:border-color .15s,background .15s;
 }}
-.filter-dd:hover,.filter-dd.open{{background:var(--surface);border-color:#0284C7}}
-.filter-dd .fd-label{{font-size:.68rem;font-weight:700;color:var(--muted);white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}}
-.filter-dd .fd-val{{font-size:.78rem;font-weight:700;color:var(--txt);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
-.filter-dd .fd-caret{{font-size:.6rem;color:var(--muted);transition:transform .15s}}
+.filter-dd:hover,.filter-dd.open{{background:rgba(255,255,255,.18);border-color:var(--brand-gold)}}
+.filter-dd .fd-label{{font-size:.68rem;font-weight:700;color:rgba(255,255,255,.55);white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}}
+.filter-dd .fd-val{{font-size:.78rem;font-weight:700;color:#FFFFFF;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+.filter-dd .fd-caret{{font-size:.6rem;color:rgba(255,255,255,.45);transition:transform .15s}}
 .filter-dd.open .fd-caret{{transform:rotate(180deg)}}
 
 /* Dropdown panel */
@@ -422,13 +429,13 @@ body{{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,san
 }}
 .fd-row:hover{{background:var(--surface2)}}
 .fd-row.all-row{{border-bottom:1px solid var(--border);font-weight:700}}
-.fd-row input[type=checkbox]{{width:14px;height:14px;cursor:pointer;accent-color:#0284C7;flex-shrink:0}}
+.fd-row input[type=checkbox]{{width:14px;height:14px;cursor:pointer;accent-color:var(--brand-blue);flex-shrink:0}}
 .fd-row span{{font-size:.74rem;font-weight:600;color:var(--txt2);line-height:1.3}}
 .fd-row.all-row span{{color:var(--txt);font-weight:700}}
 .fd-badge{{
   display:inline-flex;align-items:center;justify-content:center;
   min-width:18px;height:18px;padding:0 5px;
-  background:#0284C7;color:#fff;border-radius:9px;
+  background:var(--brand-gold);color:#fff;border-radius:9px;
   font-size:.6rem;font-weight:800;margin-left:4px;flex-shrink:0;
 }}
 .fd-search-wrap{{padding:8px 10px 6px;border-bottom:1px solid var(--border);background:var(--surface2)}}
@@ -439,10 +446,10 @@ body{{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,san
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:8px center;
 }}
-.fd-search:focus{{border-color:#0284C7;background:#F0F7FF}}
+.fd-search:focus{{border-color:var(--brand-blue);background:#EEF3FB}}
 
 select{{background:transparent;border:none;color:var(--txt);font-size:.8rem;font-weight:600;cursor:pointer;outline:none;padding:2px 0}}
-.updated{{font-size:.68rem;color:var(--muted);margin-left:auto;white-space:nowrap}}
+.updated{{font-size:.68rem;color:rgba(255,255,255,.45);margin-left:auto;white-space:nowrap}}
 
 /* ── Layout ── */
 #main{{padding:20px 24px;max-width:1600px;margin:0 auto}}
@@ -454,7 +461,7 @@ select{{background:transparent;border:none;color:var(--txt);font-size:.8rem;font
 #kpi-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px}}
 .kpi{{
   background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:14px 16px;border-top:3px solid var(--accent,#0284C7);
+  padding:14px 16px;border-top:3px solid var(--accent,#243649);
   box-shadow:var(--shadow);transition:box-shadow .15s,transform .15s;
 }}
 .kpi:hover{{box-shadow:var(--shadow-md);transform:translateY(-1px)}}
@@ -462,8 +469,8 @@ select{{background:transparent;border:none;color:var(--txt);font-size:.8rem;font
 .kpi-value{{font-size:1.75rem;font-weight:800;color:var(--txt);line-height:1;font-variant-numeric:tabular-nums}}
 .kpi-sub{{font-size:.68rem;color:var(--muted);margin-top:5px;display:flex;gap:8px;flex-wrap:wrap}}
 .badge{{display:inline-flex;align-items:center;gap:3px;font-size:.65rem;font-weight:600;padding:2px 6px;border-radius:4px}}
-.badge-m{{background:#DBEAFE;color:#1E40AF}}
-.badge-f{{background:#FCE7F3;color:#9D174D}}
+.badge-m{{background:#D1DCE9;color:#243649}}
+.badge-f{{background:#FAF0CB;color:#8A5E00}}
 
 /* ── Chart cards ── */
 .chart-card{{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}}
@@ -478,7 +485,7 @@ select{{background:transparent;border:none;color:var(--txt);font-size:.8rem;font
 .mcheck-group{{display:flex;flex-wrap:wrap;gap:6px 14px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px}}
 .mcheck-item{{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;white-space:nowrap}}
 .mcheck-item input[type=checkbox]{{
-  width:15px;height:15px;cursor:pointer;accent-color:var(--chk-col,#0284C7);
+  width:15px;height:15px;cursor:pointer;accent-color:var(--chk-col,#32579F);
   flex-shrink:0;
 }}
 .mcheck-item span{{font-size:.72rem;font-weight:600;color:var(--txt2)}}
@@ -514,7 +521,7 @@ select{{background:transparent;border:none;color:var(--txt);font-size:.8rem;font
   border-radius:6px;padding:5px 10px;font-size:.78rem;font-weight:600;
   cursor:pointer;outline:none;
 }}
-.ctrl-select:focus{{border-color:var(--c-trained)}}
+.ctrl-select:focus{{border-color:var(--brand-blue)}}
 
 /* Project search + selector */
 .drill-selector{{
@@ -534,7 +541,7 @@ select{{background:transparent;border:none;color:var(--txt);font-size:.8rem;font
   background-repeat:no-repeat;background-position:10px center;
   border-radius:0;
 }}
-.drill-search:focus{{background:#EFF6FF}}
+.drill-search:focus{{background:#EEF3FB}}
 .drill-proj-box{{
   display:flex;flex-direction:column;gap:0;
   overflow-y:auto;max-height:220px;
@@ -547,8 +554,8 @@ select{{background:transparent;border:none;color:var(--txt);font-size:.8rem;font
 }}
 .dp-item:hover{{background:var(--surface2)}}
 .dp-item.all-item{{background:var(--surface2);border-bottom:1px solid var(--border);padding:7px 12px}}
-.dp-item.all-item:hover{{background:#E0EAF8}}
-.dp-item input[type=checkbox]{{width:14px;height:14px;cursor:pointer;accent-color:#0284C7;flex-shrink:0}}
+.dp-item.all-item:hover{{background:#E8EDF5}}
+.dp-item input[type=checkbox]{{width:14px;height:14px;cursor:pointer;accent-color:var(--brand-blue);flex-shrink:0}}
 .dp-item span{{font-size:.72rem;font-weight:600;color:var(--txt2);line-height:1.3}}
 .dp-item.all-item span{{font-weight:700;color:var(--txt)}}
 .dp-sep{{display:none}}
@@ -593,9 +600,9 @@ select{{background:transparent;border:none;color:var(--txt);font-size:.8rem;font
   padding:2px 5px;border-radius:3px;color:#fff;width:fit-content;
 }}
 .drill-table tbody tr:hover .metric-col,
-.drill-table tbody tr:hover td{{background:#F8FBFF}}
-.drill-table tbody tr.sort-row .metric-col{{background:#EFF6FF}}
-.drill-table tbody tr.sort-row td{{background:#EFF6FF}}
+.drill-table tbody tr:hover td{{background:#F4F7FB}}
+.drill-table tbody tr.sort-row .metric-col{{background:#EBF0F7}}
+.drill-table tbody tr.sort-row td{{background:#EBF0F7}}
 .drill-table tbody td{{
   padding:7px 12px;border-bottom:1px solid var(--border);vertical-align:middle;
 }}
@@ -623,10 +630,19 @@ select{{background:transparent;border:none;color:var(--txt);font-size:.8rem;font
 <!-- Header -->
 <div id="header">
   <div class="logo">
-    <svg viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="34" height="34" rx="8" fill="#0F172A"/>
-      <path d="M7 24L17 8L27 24M9 21H25" stroke="#2DD4BF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="17" cy="26" r="2.5" fill="#FBBF24"/>
+    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="36" height="36" rx="8" fill="#1A2A38"/>
+      <!-- Bulb body -->
+      <ellipse cx="18" cy="15" rx="7" ry="8" fill="none" stroke="#DFA12C" stroke-width="1.8"/>
+      <!-- Person inside bulb -->
+      <circle cx="18" cy="12" r="2" fill="#32579F"/>
+      <path d="M15 17 Q18 20 21 17" stroke="#32579F" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      <!-- Filament lines -->
+      <path d="M15.5 23h5M16 25h4" stroke="#DFA12C" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- Left leaf -->
+      <path d="M11 22 Q7 19 10 15" stroke="#2D6B2A" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+      <!-- Right leaf -->
+      <path d="M25 22 Q29 19 26 15" stroke="#2D6B2A" stroke-width="1.8" stroke-linecap="round" fill="none"/>
     </svg>
     <div class="logo-text"><h1>StartHub Africa</h1><span>Impact Dashboard</span></div>
   </div>
@@ -748,34 +764,39 @@ select{{background:transparent;border:none;color:var(--txt);font-size:.8rem;font
 const DATA = {data_json};
 
 // ── Config ─────────────────────────────────────────────────────────────────
+// Brand thematic colour lineup — Blue One → Blue Two → Gold → Green → Burgundy → tints
 const METRICS = [
-  {{key:'trained_total', label:'Trained',             icon:'🎓', color:'#0284C7', prefix:''}},
-  {{key:'tot_total',     label:'Training of Trainers',icon:'📚', color:'#7C3AED', prefix:''}},
-  {{key:'biz_supported', label:'Biz Supported',       icon:'🏢', color:'#B45309', prefix:''}},
-  {{key:'biz_started',   label:'Biz Started',         icon:'🚀', color:'#059669', prefix:''}},
-  {{key:'jobs',          label:'Jobs Placed',          icon:'💼', color:'#DC2626', prefix:''}},
-  {{key:'internships',   label:'Internships',          icon:'📋', color:'#2563EB', prefix:''}},
-  {{key:'grants_count',  label:'Grants (count)',       icon:'🏷️', color:'#BE185D', prefix:''}},
-  {{key:'grants_value',  label:'Grants (USD)',         icon:'💰', color:'#EA580C', prefix:'$'}},
+  {{key:'trained_total', label:'Trained',             icon:'🎓', color:'#243649', prefix:''}},
+  {{key:'tot_total',     label:'Training of Trainers',icon:'📚', color:'#32579F', prefix:''}},
+  {{key:'biz_supported', label:'Biz Supported',       icon:'🏢', color:'#DFA12C', prefix:''}},
+  {{key:'biz_started',   label:'Biz Started',         icon:'🚀', color:'#2D6B2A', prefix:''}},
+  {{key:'jobs',          label:'Jobs Placed',          icon:'💼', color:'#7A1E2E', prefix:''}},
+  {{key:'internships',   label:'Internships',          icon:'📋', color:'#3E6B8A', prefix:''}},
+  {{key:'grants_count',  label:'Grants (count)',       icon:'🏷️', color:'#5B9BC4', prefix:''}},
+  {{key:'grants_value',  label:'Grants (USD)',         icon:'💰', color:'#E8B84B', prefix:'$'}},
 ];
 const METRIC_MAP = Object.fromEntries(METRICS.map(m=>[m.key,m]));
 
-const COUNTRY_COLORS = {{Uganda:'#0891B2', Tanzania:'#D97706', Kenya:'#DC2626'}};
-const COUNTRY_BG     = {{Uganda:'#E0F7FA', Tanzania:'#FFF8E1', Kenya:'#FFEBEE'}};
+// Country colours from brand palette
+const COUNTRY_COLORS = {{Uganda:'#243649', Tanzania:'#DFA12C', Kenya:'#32579F'}};
+const COUNTRY_BG     = {{Uganda:'#E6EAF0', Tanzania:'#FDF5E1', Kenya:'#E7EBF6'}};
 const COUNTRIES = ['Uganda','Tanzania','Kenya'];
 
-// Pastel palette for project columns
+// Brand-derived pastel tints for project columns
+// Groups: Blue One tints · Blue Two tints · Gold tints · Green tints · Burgundy tints (×4 each)
 const PROJ_BG = [
-  '#DBEAFE','#D1FAE5','#FEF3C7','#FCE7F3','#EDE9FE',
-  '#FFEDD5','#E0F2FE','#F0FDF4','#FFF7ED','#FDF4FF',
-  '#ECFDF5','#EFF6FF','#FFF1F2','#F0F9FF','#FEFCE8',
-  '#E0E7FF','#FFE4E6','#CFFAFE','#F7FEE7','#FEF9C3',
+  '#E6EAF0','#D1DCE9','#B8C9D9','#9FB6CA',
+  '#E7EBF6','#D1D9EE','#BAC9E6','#A3B8DE',
+  '#FDF5E1','#FAF0CB','#F7E8B0','#F4DF95',
+  '#E7F1E7','#D1E6D1','#BDDABD','#A9CEA9',
+  '#F2E7EA','#E6D1D5','#DABAC1','#CEA4AD',
 ];
 const PROJ_BORDER = [
-  '#93C5FD','#6EE7B7','#FCD34D','#F9A8D4','#C4B5FD',
-  '#FDBA74','#7DD3FC','#86EFAC','#FED7AA','#E879F9',
-  '#6EE7B7','#BFDBFE','#FECDD3','#BAE6FD','#FDE047',
-  '#A5B4FC','#FDA4AF','#67E8F9','#BEF264','#FEF08A',
+  '#3E6B8A','#32579F','#243649','#1A2E40',
+  '#32579F','#4A6FC0','#6283C8','#7A97D0',
+  '#DFA12C','#E8B84B','#F0CC70','#F5DC95',
+  '#2D6B2A','#4A9B45','#68B060','#86C57B',
+  '#7A1E2E','#9B3040','#BC4255','#D4647A',
 ];
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -1007,7 +1028,7 @@ function initTrend(){{
       plugins:{{
         legend:{{display:false}},
         tooltip:{{
-          backgroundColor:'#1E293B',borderColor:'#334155',borderWidth:1,
+          backgroundColor:'#243649',borderColor:'#DFA12C',borderWidth:1,
           titleColor:'#F1F5F9',bodyColor:'#94A3B8',padding:10,
           callbacks:{{label:c=>` ${{c.dataset.label}}: ${{c.parsed.y?.toLocaleString?.()??c.parsed.y}}`}}
         }}
@@ -1043,7 +1064,7 @@ function renderDonut(){{
     options:{{
       responsive:true,maintainAspectRatio:false,cutout:'62%',
       plugins:{{
-        legend:{{position:'bottom',labels:{{color:'#64748B',font:{{size:11}},padding:14,usePointStyle:true}}}},
+        legend:{{position:'bottom',labels:{{color:'#334155',font:{{size:11,family:"'Plus Jakarta Sans',sans-serif"}},padding:14,usePointStyle:true}}}},
         tooltip:{{
           backgroundColor:'#1E293B',borderColor:'#334155',borderWidth:1,
           callbacks:{{label:c=>`${{c.label}}: ${{c.parsed.toLocaleString()}} (${{pct(c.parsed,vals.reduce((a,b)=>a+b,0))}}%)`}}
@@ -1113,14 +1134,14 @@ function renderGender(){{
   charts.gender = new Chart(ctx,{{
     type:'bar',
     data:{{labels:years,datasets:[
-      {{label:'Male',data:mVals,backgroundColor:'#BFDBFE',borderColor:'#3B82F6',borderWidth:1,borderRadius:3,stack:'g'}},
-      {{label:'Female',data:fVals,backgroundColor:'#FBCFE8',borderColor:'#EC4899',borderWidth:1,borderRadius:3,stack:'g'}},
+      {{label:'Male',data:mVals,backgroundColor:'#B8C9D9',borderColor:'#243649',borderWidth:1,borderRadius:3,stack:'g'}},
+      {{label:'Female',data:fVals,backgroundColor:'#FAF0CB',borderColor:'#DFA12C',borderWidth:1,borderRadius:3,stack:'g'}},
     ]}},
     options:{{
       responsive:true,maintainAspectRatio:false,
       plugins:{{
-        legend:{{position:'top',labels:{{color:'#64748B',font:{{size:11}},usePointStyle:true}}}},
-        tooltip:{{backgroundColor:'#1E293B',borderColor:'#334155',borderWidth:1,
+        legend:{{position:'top',labels:{{color:'#334155',font:{{size:11,family:"'Plus Jakarta Sans',sans-serif"}},usePointStyle:true}}}},
+        tooltip:{{backgroundColor:'#243649',borderColor:'#DFA12C',borderWidth:1,
           callbacks:{{afterBody:items=>{{const t=items.reduce((s,i)=>s+i.parsed.y,0);return t?[`Total: ${{t.toLocaleString()}}`]:[];}}}}
         }}
       }},
@@ -1157,7 +1178,7 @@ function renderGrants(){{
       indexAxis:'y',responsive:true,maintainAspectRatio:false,
       plugins:{{
         legend:{{display:false}},
-        tooltip:{{backgroundColor:'#1E293B',borderColor:'#334155',borderWidth:1,
+        tooltip:{{backgroundColor:'#243649',borderColor:'#DFA12C',borderWidth:1,
           callbacks:{{label:c=>`USD ${{Math.round(c.parsed.x).toLocaleString()}} · ${{ps[c.dataIndex].country}}`}}
         }}
       }},
