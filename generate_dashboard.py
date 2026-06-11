@@ -638,8 +638,8 @@ select{{
       <div><label>Sort by &nbsp;</label><select class="ctrl-select" id="drill-sort">
         <option value="trained_total">Trained</option>
         <option value="tot_total">Training of Trainers</option>
-        <option value="biz_supported">Biz Supported</option>
-        <option value="biz_started">Biz Started</option>
+        <option value="biz_supported">Businesses Supported</option>
+        <option value="biz_started">Businesses Started</option>
         <option value="jobs">Jobs Placed</option>
         <option value="internships">Internships</option>
         <option value="grants_count">Grants (count)</option>
@@ -680,8 +680,8 @@ const DATA = {data_json};
 const METRICS = [
   {{key:'trained_total', label:'Trained',              color:'#042a2b', prefix:''}},
   {{key:'tot_total',     label:'Training of Trainers', color:'#3d8f9c', prefix:''}},
-  {{key:'biz_supported', label:'Biz Supported',        color:'#ef7b45', prefix:''}},
-  {{key:'biz_started',   label:'Biz Started',          color:'#1a7a6e', prefix:''}},
+  {{key:'biz_supported', label:'Businesses Supported',  color:'#ef7b45', prefix:''}},
+  {{key:'biz_started',   label:'Businesses Started',   color:'#1a7a6e', prefix:''}},
   {{key:'jobs',          label:'Jobs Placed',           color:'#f59e0b', prefix:''}},
   {{key:'internships',   label:'Internships',           color:'#5eb1bf', prefix:''}},
   {{key:'grants_count',  label:'Grants',                color:'#d496a7', prefix:''}},
@@ -733,7 +733,9 @@ function getMetrics(yr,country){{
   if(!state.programmes.length) return getRawMetrics(yr,country);
   // Programme filter: aggregate from project level
   const yd=DATA.years[yr]; if(!yd) return null;
-  const ctrs=country==='all'?COUNTRIES:[country];
+  // Respect both the country argument AND the header country filter
+  const headerCtrs = state.countries.length ? state.countries : COUNTRIES;
+  const ctrs = country==='all' ? headerCtrs : (headerCtrs.includes(country) ? [country] : []);
   const tot=blank();
   for(const c of ctrs){{
     for(const p of (yd.countries?.[c]?.projects||[])){{
@@ -791,28 +793,24 @@ function pct(a,b){{ return b>0?Math.round(a/b*100):0; }}
 function normName(n){{ return (n||'').trim().replace(/\s+/g,' '); }}
 
 function getProjects(drillCountry,applyProgFilter){{
-  const years=state.years.length?state.years:getYears();
-  let ctrs;
-  if(drillCountry!=='all') ctrs=[drillCountry];
-  else ctrs=state.countries.length?state.countries:COUNTRIES;
-  const map={{}};
-  const display={{}};
+  const years = state.years.length ? state.years : getYears();
+  // Resolve effective country list: header country filter + optional drill-country override
+  const headerCtrs = state.countries.length ? state.countries : COUNTRIES;
+  const ctrs = drillCountry !== 'all' ? [drillCountry] : headerCtrs;
+  const map = {{}};
   for(const yr of years){{
     const yd = DATA.years[yr]; if(!yd) continue;
-    for(const c of COUNTRIES){{
-      if(drillCountry!=='all'&&c!==drillCountry) continue;
+    for(const c of ctrs){{
       for(const p of (yd.countries?.[c]?.projects||[])){{
-        // normalise key: lowercase + trim → merges capitalisation variants
         const key = normName(p.name).toLowerCase()+'||'+c;
+        // Apply programme filter when active
+        if(state.programmes.length && !state.programmes.includes(key)) continue;
         if(map[key]){{
           Object.keys(p.metrics||{{}}).forEach(k=>{{
             map[key].metrics[k]=(map[key].metrics[k]||0)+(p.metrics[k]||0);
           }});
         }} else {{
-          // prefer the title-cased / capitalised variant as display name
-          const raw = normName(p.name);
-          const titled = raw.replace(/\w/g,ch=>ch.toUpperCase());
-          display[key] = titled;
+          const titled = normName(p.name).replace(/\b\w/g,ch=>ch.toUpperCase());
           map[key]={{name:titled,country:c,metrics:{{...(p.metrics||{{}})}}}};
         }}
       }}
@@ -835,7 +833,7 @@ function animateKpi(el,target,prefix,key){{
     const cur=Math.round(sv+(target-sv)*e);
     el.textContent=cur<=0?'\u2014':(prefix+cur.toLocaleString());
     if(p<1)requestAnimationFrame(step);
-    else el.textContent=fmt(target,prefix);
+    else el.textContent=target===0?'—':(prefix+target.toLocaleString());
   }}
   requestAnimationFrame(step);
 }}
@@ -859,7 +857,7 @@ function renderKPI(){{
     }}
     return '<div class="kpi" style="--kpi-accent:'+met.color+';animation-delay:'+idx*.04+'s">'+
            '<div class="kpi-header"><span class="kpi-dot"></span><span class="kpi-label">'+met.label+'</span></div>'+
-           '<div class="kpi-value" data-key="'+met.key+'" data-prefix="'+met.prefix+'">'+fmt(v,met.prefix)+'</div>'+
+           '<div class="kpi-value" data-key="'+met.key+'" data-prefix="'+met.prefix+'">'+fmtFull(v,met.prefix)+'</div>'+
            (sub?'<div class="kpi-sub">'+sub+'</div>':'')+'</div>';
   }});
   document.getElementById('kpi-grid').innerHTML = rows.join('');
@@ -919,23 +917,22 @@ function renderTrendChecks(){{
 }}
 
 function buildTrendDatasets(){{
-  const allYrs=getYears();
-  const actYrs=new Set(state.years.length?state.years:allYrs);
-  const ctrs=state.countries.length?state.countries:COUNTRIES;
+  // Only show the actively-selected years as chart labels
+  const activeYrs = state.years.length ? [...state.years].sort() : getYears();
+  const ctrs = state.countries.length ? state.countries : COUNTRIES;
   return {{
-    labels:allYrs,
-    datasets:METRICS.filter(m=>state.activeMetrics.includes(m.key)).map(m=>{{
-      const vals=allYrs.map(yr=>{{
-        if(!actYrs.has(yr)) return null;
+    labels: activeYrs,
+    datasets: METRICS.filter(m=>state.activeMetrics.includes(m.key)).map(m=>{{
+      const vals = activeYrs.map(yr=>{{
         let tot=0;
         for(const c of ctrs){{const mm=getMetrics(yr,c);if(mm)tot+=mm[m.key]||0;}}
-        return tot;
+        return tot||null;
       }});
       return {{
-        label:m.label,data:vals,
-        borderColor:m.color,backgroundColor:m.color+'22',
-        borderWidth:2.5,pointRadius:5,pointHoverRadius:7,
-        spanGaps:true,fill:false,tension:0.3,
+        label:m.label, data:vals,
+        borderColor:m.color, backgroundColor:m.color+'22',
+        borderWidth:2.5, pointRadius:5, pointHoverRadius:7,
+        spanGaps:true, fill:false, tension:0.3,
         yAxisID:m.key==='grants_value'?'y2':'y1'
       }};
     }})
@@ -950,7 +947,7 @@ function initTrend(){{
     options:{{
       responsive:true, maintainAspectRatio:false,
       interaction:{{mode:'index',intersect:false}},
-      onClick:(e,els)=>{{ if(els.length) openModal(getYears()[els[0].index]); }},
+      onClick:(e,els)=>{{ if(els.length && charts.trend) openModal(charts.trend.data.labels[els[0].index]); }},
         animation:{{duration:900,easing:'easeOutQuart',onComplete:()=>ctx.parentElement.classList.remove('loading')}},
       plugins:{{
         legend:{{display:false}},
@@ -979,17 +976,15 @@ function updateTrend(){{
 function renderDonut(){{
   const yrs=state.years.length?state.years:getYears();
   const actCtrs=state.countries.length?state.countries:COUNTRIES;
-  const vals=COUNTRIES.map(c=>{{
-    if(!actCtrs.includes(c)) return 0;
-    return yrs.reduce((s,yr)=>{{const m=getMetrics(yr,c);return s+(m?.trained_total||0);}},0);
-  }});
+  // Only include active countries in the chart (no 0-value slices for filtered-out countries)
+  const vals=actCtrs.map(c=>yrs.reduce((s,yr)=>{{const m=getMetrics(yr,c);return s+(m?.trained_total||0);}},0));
   const ctx = document.getElementById('donut-chart');
   if(charts.donut) charts.donut.destroy();
   charts.donut = new Chart(ctx,{{
     type:'doughnut',
-    data:{{labels:COUNTRIES,datasets:[{{
+    data:{{labels:actCtrs,datasets:[{{
       data:vals,
-      backgroundColor:COUNTRIES.map(c=>COUNTRY_COLORS[c]),
+      backgroundColor:actCtrs.map(c=>COUNTRY_COLORS[c]),
       borderColor:'#ffffff', borderWidth:3, hoverOffset:10
     }}]}},
     options:{{
@@ -1087,7 +1082,7 @@ function renderGrants(){{
   const ps = getProjects('all',true).filter(p=>(p.metrics.grants_value||0)>0)
     .sort((a,b)=>(b.metrics.grants_value||0)-(a.metrics.grants_value||0)).slice(0,14);
   const wrap = document.getElementById('grants-wrap');
-  if(!ps.length){{ wrap.innerHTML='<div class="no-data">No grant data for selected filters</div>'; if(charts.grants)charts.grants.destroy(); return; }}
+  if(!ps.length){{ wrap.innerHTML='<div class="no-data">No grant data for selected filters</div>'; if(charts.grants){{charts.grants.destroy();charts.grants=null;}} return; }}
   if(!wrap.querySelector('canvas')){{ wrap.innerHTML='<canvas id="grants-chart"></canvas>'; }}
   const ctx = document.getElementById('grants-chart');
   if(charts.grants) charts.grants.destroy();
@@ -1291,7 +1286,7 @@ function openModal(yr){{
     data:{{labels:months,datasets:[
       {{label:'Trained',      data:months.map(m=>getV(m,'trained_total')), backgroundColor:'#1a7a6e',borderColor:'#1a7a6e',borderWidth:0,borderRadius:4}},
       {{label:'ToT',          data:months.map(m=>getV(m,'tot_total')),     backgroundColor:'#3d8f9c',borderColor:'#3d8f9c',borderWidth:0,borderRadius:4}},
-      {{label:'Biz Supported',data:months.map(m=>getV(m,'biz_supported')), backgroundColor:'#ef7b45',borderColor:'#ef7b45',borderWidth:0,borderRadius:4}},
+      {{label:'Businesses Supported',data:months.map(m=>getV(m,'biz_supported')), backgroundColor:'#ef7b45',borderColor:'#ef7b45',borderWidth:0,borderRadius:4}},
       {{label:'Jobs',         data:months.map(m=>getV(m,'jobs')),          backgroundColor:'#f59e0b',borderColor:'#f59e0b',borderWidth:0,borderRadius:4}},
     ]}},
     options:{{
@@ -1387,6 +1382,8 @@ function buildMultiSelect(cfg){{
     }});
   }}
   refreshBtn();refreshList();
+  // Stop clicks inside the dropdown from bubbling to the document close handler
+  dd.addEventListener('click',function(e){{e.stopPropagation();}});
   btn.addEventListener('click',function(e){{
     e.stopPropagation();
     var wasOpen=wrap.classList.contains('open');
