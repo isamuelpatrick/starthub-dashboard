@@ -355,34 +355,34 @@ def generate_html(data):
 <style>
 *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
 :root{{
-  --bg:#EEF2F6;
+  --bg:#F0F4F9;
   --surface:#FFFFFF;
-  --surface2:#F8FAFC;
-  --border:#E2E8F0;
-  --border2:#CBD5E1;
-  --txt:#0F172A;
-  --txt2:#334155;
-  --muted:#64748B;
-  --shadow:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
-  --shadow-md:0 4px 12px rgba(0,0,0,.06),0 2px 4px rgba(0,0,0,.04);
-  --radius:10px;
-  /* Brand primary colours — StartHub Africa Style Guide */
+  --surface2:#F7F9FC;
+  --border:#E3E8F0;
+  --border2:#C9D4E0;
+  --txt:#111827;
+  --txt2:#374151;
+  --muted:#6B7280;
+  --shadow:0 1px 4px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.03);
+  --shadow-md:0 4px 20px rgba(0,0,0,.09),0 2px 6px rgba(0,0,0,.05);
+  --radius:12px;
+  /* Brand structural */
   --brand-navy:#243649;
   --brand-blue:#32579F;
   --brand-gold:#DFA12C;
-  /* Metric accent colours — thematic lineup from brand palette */
-  --c-trained:#243649;
-  --c-tot:#32579F;
-  --c-biz-sup:#DFA12C;
-  --c-biz-sta:#2D6B2A;
-  --c-jobs:#7A1E2E;
-  --c-intern:#3E6B8A;
-  --c-grants-n:#5B9BC4;
-  --c-grants-v:#E8B84B;
+  /* Data colours — full categorical spectrum, max differentiation */
+  --c-trained:#3B82F6;
+  --c-tot:#8B5CF6;
+  --c-biz-sup:#F59E0B;
+  --c-biz-sta:#10B981;
+  --c-jobs:#EF4444;
+  --c-intern:#06B6D4;
+  --c-grants-n:#EC4899;
+  --c-grants-v:#F97316;
   /* Country colours */
-  --uganda:#243649;
-  --tanzania:#DFA12C;
-  --kenya:#32579F;
+  --uganda:#3B82F6;
+  --tanzania:#F59E0B;
+  --kenya:#10B981;
 }}
 html{{font-size:14px;color-scheme:light}}
 body{{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif;min-height:100vh}}
@@ -452,45 +452,67 @@ select{{background:transparent;border:none;color:var(--txt);font-size:.8rem;font
 .updated{{font-size:.68rem;color:rgba(255,255,255,.45);margin-left:auto;white-space:nowrap}}
 
 /* ── Layout ── */
-#main{{padding:20px 24px;max-width:1600px;margin:0 auto}}
-.sec-label{{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}}
+#main{{padding:22px 28px;max-width:1600px;margin:0 auto}}
+.sec-label{{
+  font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--brand-navy);margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+}}
+.sec-label::before{{content:'';width:4px;height:14px;background:var(--brand-gold);border-radius:2px;flex-shrink:0}}
 .sec-label::after{{content:'';flex:1;height:1px;background:var(--border)}}
-.mb{{margin-bottom:22px}}
+.mb{{margin-bottom:26px}}
 
-/* ── KPI Cards ── */
-#kpi-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px}}
+/* ── KPI Cards — bento grid ── */
+#kpi-grid{{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}}
+@media(max-width:1000px){{#kpi-grid{{grid-template-columns:repeat(2,1fr)}}}}
+@media(max-width:560px){{#kpi-grid{{grid-template-columns:1fr}}}}
 .kpi{{
   background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:14px 16px;border-top:3px solid var(--accent,#243649);
-  box-shadow:var(--shadow);transition:box-shadow .15s,transform .15s;
+  padding:18px 20px 16px 22px;border-left:4px solid var(--accent,#3B82F6);
+  box-shadow:var(--shadow);transition:box-shadow .2s,transform .2s;
+  position:relative;overflow:hidden;
 }}
-.kpi:hover{{box-shadow:var(--shadow-md);transform:translateY(-1px)}}
-.kpi-label{{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px}}
-.kpi-value{{font-size:1.75rem;font-weight:800;color:var(--txt);line-height:1;font-variant-numeric:tabular-nums}}
-.kpi-sub{{font-size:.68rem;color:var(--muted);margin-top:5px;display:flex;gap:8px;flex-wrap:wrap}}
-.badge{{display:inline-flex;align-items:center;gap:3px;font-size:.65rem;font-weight:600;padding:2px 6px;border-radius:4px}}
-.badge-m{{background:#D1DCE9;color:#243649}}
-.badge-f{{background:#FAF0CB;color:#8A5E00}}
+.kpi.hero{{grid-column:span 2}}
+.kpi::before{{
+  content:'';position:absolute;top:0;right:0;width:120px;height:100%;
+  background:linear-gradient(to left,var(--accent-bg,transparent),transparent);
+  pointer-events:none;
+}}
+.kpi:hover{{box-shadow:var(--shadow-md);transform:translateY(-2px)}}
+.kpi-label{{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}}
+.kpi-value{{font-size:2.1rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}}
+.kpi.hero .kpi-value{{font-size:2.6rem}}
+.kpi-sub{{font-size:.68rem;color:var(--muted);margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}}
+.badge{{display:inline-flex;align-items:center;gap:3px;font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:20px}}
+.badge-m{{background:#DBEAFE;color:#1E40AF}}
+.badge-f{{background:#FCE7F3;color:#9D174D}}
 
 /* ── Chart cards ── */
-.chart-card{{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}}
-.chart-card h3{{font-size:.82rem;font-weight:700;color:var(--txt);margin-bottom:2px}}
-.chart-meta{{font-size:.68rem;color:var(--muted);margin-bottom:12px}}
+.chart-card{{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}}
+.chart-card h3{{font-size:.9rem;font-weight:700;color:var(--txt);margin-bottom:3px}}
+.chart-meta{{font-size:.69rem;color:var(--muted);margin-bottom:14px}}
 .chart-wrap canvas{{width:100%!important}}
-.charts-2{{display:grid;grid-template-columns:2fr 1fr;gap:14px}}
-.charts-eq{{display:grid;grid-template-columns:1fr 1fr;gap:14px}}
+.charts-2{{display:grid;grid-template-columns:2fr 1fr;gap:16px}}
+.charts-eq{{display:grid;grid-template-columns:1fr 1fr;gap:16px}}
 @media(max-width:900px){{.charts-2,.charts-eq{{grid-template-columns:1fr}}}}
 
 /* ── Metric Checkboxes ── */
-.mcheck-group{{display:flex;flex-wrap:wrap;gap:6px 14px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px}}
-.mcheck-item{{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;white-space:nowrap}}
-.mcheck-item input[type=checkbox]{{
-  width:15px;height:15px;cursor:pointer;accent-color:var(--chk-col,#32579F);
-  flex-shrink:0;
+.mcheck-group{{display:flex;flex-wrap:wrap;gap:4px 8px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px}}
+.mcheck-item{{
+  display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;white-space:nowrap;
+  padding:4px 10px;border-radius:20px;border:1.5px solid transparent;
+  transition:background .12s,border-color .12s;
 }}
-.mcheck-item span{{font-size:.72rem;font-weight:600;color:var(--txt2)}}
+.mcheck-item:has(input:checked){{background:var(--surface);border-color:var(--border2);box-shadow:var(--shadow)}}
+.mcheck-item:hover{{background:var(--surface);border-color:var(--border)}}
+.mcheck-item input[type=checkbox]{{display:none}}
+.mcheck-dot{{width:10px;height:10px;border-radius:50%;background:var(--chk-col,#3B82F6);flex-shrink:0;opacity:.4;transition:opacity .12s}}
+.mcheck-item:has(input:checked) .mcheck-dot{{opacity:1}}
+.mcheck-item span{{font-size:.72rem;font-weight:600;color:var(--muted)}}
+.mcheck-item:has(input:checked) span{{color:var(--txt2)}}
+.mcheck-item.all-item{{background:var(--surface);border-color:var(--border2)}}
 .mcheck-item.all-item span{{font-weight:700;color:var(--txt)}}
-.mcheck-sep{{width:1px;background:var(--border);align-self:stretch;margin:0 4px}}
+.mcheck-sep{{display:none}}
 
 /* ── Country Metrics Table ── */
 .country-metrics-table{{width:100%;border-collapse:collapse;font-size:.76rem}}
@@ -764,39 +786,39 @@ select{{background:transparent;border:none;color:var(--txt);font-size:.8rem;font
 const DATA = {data_json};
 
 // ── Config ─────────────────────────────────────────────────────────────────
-// Brand thematic colour lineup — Blue One → Blue Two → Gold → Green → Burgundy → tints
+// Categorical palette — maximally distinct hues, ordered by importance for bento layout
+// Row 1: Trained(hero×2) | Biz Supported | Biz Started
+// Row 2: Jobs | Internships | Grants USD(hero×2)
+// Row 3: Training of Trainers(hero×2) | Grants Count(hero×2)
 const METRICS = [
-  {{key:'trained_total', label:'Trained',             icon:'🎓', color:'#243649', prefix:''}},
-  {{key:'tot_total',     label:'Training of Trainers',icon:'📚', color:'#32579F', prefix:''}},
-  {{key:'biz_supported', label:'Biz Supported',       icon:'🏢', color:'#DFA12C', prefix:''}},
-  {{key:'biz_started',   label:'Biz Started',         icon:'🚀', color:'#2D6B2A', prefix:''}},
-  {{key:'jobs',          label:'Jobs Placed',          icon:'💼', color:'#7A1E2E', prefix:''}},
-  {{key:'internships',   label:'Internships',          icon:'📋', color:'#3E6B8A', prefix:''}},
-  {{key:'grants_count',  label:'Grants (count)',       icon:'🏷️', color:'#5B9BC4', prefix:''}},
-  {{key:'grants_value',  label:'Grants (USD)',         icon:'💰', color:'#E8B84B', prefix:'$'}},
+  {{key:'trained_total', label:'Entrepreneurs Trained', icon:'🎓', color:'#3B82F6', prefix:'',  hero:true}},
+  {{key:'biz_supported', label:'Biz Supported',         icon:'🏢', color:'#F59E0B', prefix:'',  hero:false}},
+  {{key:'biz_started',   label:'Biz Started',           icon:'🚀', color:'#10B981', prefix:'',  hero:false}},
+  {{key:'jobs',          label:'Jobs Placed',            icon:'💼', color:'#EF4444', prefix:'',  hero:false}},
+  {{key:'internships',   label:'Internships',            icon:'📋', color:'#06B6D4', prefix:'',  hero:false}},
+  {{key:'grants_value',  label:'Grants (USD)',           icon:'💰', color:'#F97316', prefix:'$', hero:true}},
+  {{key:'tot_total',     label:'Training of Trainers',  icon:'📚', color:'#8B5CF6', prefix:'',  hero:true}},
+  {{key:'grants_count',  label:'Grants Awarded',        icon:'🏷️', color:'#EC4899', prefix:'',  hero:true}},
 ];
 const METRIC_MAP = Object.fromEntries(METRICS.map(m=>[m.key,m]));
 
-// Country colours from brand palette
-const COUNTRY_COLORS = {{Uganda:'#243649', Tanzania:'#DFA12C', Kenya:'#32579F'}};
-const COUNTRY_BG     = {{Uganda:'#E6EAF0', Tanzania:'#FDF5E1', Kenya:'#E7EBF6'}};
+// Country colours — vivid, distinct
+const COUNTRY_COLORS = {{Uganda:'#3B82F6', Tanzania:'#F59E0B', Kenya:'#10B981'}};
+const COUNTRY_BG     = {{Uganda:'#EFF6FF', Tanzania:'#FFFBEB', Kenya:'#ECFDF5'}};
 const COUNTRIES = ['Uganda','Tanzania','Kenya'];
 
-// Brand-derived pastel tints for project columns
-// Groups: Blue One tints · Blue Two tints · Gold tints · Green tints · Burgundy tints (×4 each)
+// Categorical pastel backgrounds and borders for project columns
 const PROJ_BG = [
-  '#E6EAF0','#D1DCE9','#B8C9D9','#9FB6CA',
-  '#E7EBF6','#D1D9EE','#BAC9E6','#A3B8DE',
-  '#FDF5E1','#FAF0CB','#F7E8B0','#F4DF95',
-  '#E7F1E7','#D1E6D1','#BDDABD','#A9CEA9',
-  '#F2E7EA','#E6D1D5','#DABAC1','#CEA4AD',
+  '#EFF6FF','#F5F3FF','#FFFBEB','#ECFDF5','#FEF2F2',
+  '#ECFEFF','#FDF2F8','#FFF7ED','#F0F9FF','#F0FDF4',
+  '#EEF2FF','#FFF1F2','#FEFCE8','#F0FDFA','#FAF5FF',
+  '#FFF8F0','#F0F4FF','#FFFAF0','#F5FFFA','#FFF0F5',
 ];
 const PROJ_BORDER = [
-  '#3E6B8A','#32579F','#243649','#1A2E40',
-  '#32579F','#4A6FC0','#6283C8','#7A97D0',
-  '#DFA12C','#E8B84B','#F0CC70','#F5DC95',
-  '#2D6B2A','#4A9B45','#68B060','#86C57B',
-  '#7A1E2E','#9B3040','#BC4255','#D4647A',
+  '#3B82F6','#8B5CF6','#F59E0B','#10B981','#EF4444',
+  '#06B6D4','#EC4899','#F97316','#6366F1','#22C55E',
+  '#818CF8','#FB7185','#FCD34D','#34D399','#60A5FA',
+  '#FB923C','#A78BFA','#FCA5A5','#6EE7B7','#93C5FD',
 ];
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -908,6 +930,10 @@ function getProjects(drillCountry){{
       if(drillCountry!=='all'&&c!==drillCountry) continue;
       if(!headerCtrs.includes(c)) continue;
       for(const p of (yd.countries?.[c]?.projects||[])){{
+        // Apply programme filter (state.activeProjects) if set
+        if(state.activeProjects){{
+          if(!state.activeProjects.has(normName(p.name).toLowerCase())) continue;
+        }}
         // normalise key: lowercase + trim → merges capitalisation variants
         const key = normName(p.name).toLowerCase()+'||'+c;
         if(map[key]){{
@@ -924,30 +950,55 @@ function getProjects(drillCountry){{
   return Object.values(map);
 }}
 
+// ── Count-up animation ────────────────────────────────────────────────────
+function countUp(el, target, prefix, duration){{
+  const start = performance.now();
+  function step(now){{
+    const p = Math.min((now-start)/duration,1);
+    const ease = 1-Math.pow(1-p,3); // ease-out cubic
+    const v = Math.round(target*ease);
+    el.textContent = prefix + v.toLocaleString();
+    if(p<1) requestAnimationFrame(step);
+    else el.textContent = prefix + target.toLocaleString();
+  }}
+  requestAnimationFrame(step);
+}}
+
 // ── KPI Cards ─────────────────────────────────────────────────────────────
 function renderKPI(){{
   const m = getFiltered();
   const rows = METRICS.map(met=>{{
-    const v = m[met.key]||0;
+    const v = Math.round(m[met.key]||0);
     let sub = '';
     if(met.key==='trained_total'){{
       const tm=m.trained_m||0, tf=m.trained_f||0;
-      if(tm||tf) sub=`<span class="badge badge-m">♂ ${{fmtFull(tm)}}</span><span class="badge badge-f">♀ ${{fmtFull(tf)}}</span>`;
+      if(tm||tf) sub=`<span class="badge badge-m">♂ ${{Math.round(tm).toLocaleString()}}</span>`+
+                     `<span class="badge badge-f">♀ ${{Math.round(tf).toLocaleString()}}</span>`;
     }}
     if(met.key==='tot_total'){{
       const tm=m.tot_m||0, tf=m.tot_f||0;
-      if(tm||tf) sub=`<span class="badge badge-m">♂ ${{fmtFull(tm)}}</span><span class="badge badge-f">♀ ${{fmtFull(tf)}}</span>`;
+      if(tm||tf) sub=`<span class="badge badge-m">♂ ${{Math.round(tm).toLocaleString()}}</span>`+
+                     `<span class="badge badge-f">♀ ${{Math.round(tf).toLocaleString()}}</span>`;
     }}
     if(met.key==='grants_value'){{
-      sub=`<span style="color:var(--muted)">${{m.grants_count||0}} grants awarded</span>`;
+      const gc=m.grants_count||0;
+      if(gc) sub=`<span style="color:var(--muted)">${{Math.round(gc).toLocaleString()}} grants</span>`;
     }}
-    return `<div class="kpi" style="--accent:${{met.color}}">
-      <div class="kpi-label">${{met.icon}} ${{met.label}}</div>
-      <div class="kpi-value">${{fmt(v,met.prefix)}}</div>
+    const heroClass = met.hero?'hero':'';
+    return `<div class="kpi ${{heroClass}}" style="--accent:${{met.color}};--accent-bg:${{met.color}}18" data-kpi-val="${{v}}" data-kpi-prefix="${{met.prefix}}">
+      <div class="kpi-label">${{met.label}}</div>
+      <div class="kpi-value" style="color:${{met.color}}">${{met.prefix}}${{v.toLocaleString()}}</div>
       ${{sub?`<div class="kpi-sub">${{sub}}</div>`:''}}
     </div>`;
   }});
   document.getElementById('kpi-grid').innerHTML = rows.join('');
+  // Trigger count-up on each card
+  document.querySelectorAll('#kpi-grid .kpi').forEach(card=>{{
+    const val = parseFloat(card.dataset.kpiVal)||0;
+    const pfx = card.dataset.kpiPrefix||'';
+    const el  = card.querySelector('.kpi-value');
+    if(el && val>0) countUp(el, val, pfx, 900);
+  }});
 }}
 
 // ── Checkbox group builder (reusable) ────────────────────────────────────────
@@ -958,13 +1009,13 @@ function buildCheckGroup(containerId, stateKey, onChangeFn){{
   wrap.innerHTML = `
     <label class="mcheck-item all-item">
       <input type="checkbox" id="${{containerId}}-all" ${{allChecked()?'checked':''}}>
-      <span>Select All</span>
+      <span>All Metrics</span>
     </label>
-    <div class="mcheck-sep"></div>
     ${{METRICS.map(m=>`
       <label class="mcheck-item" style="--chk-col:${{m.color}}">
         <input type="checkbox" data-mk="${{m.key}}" ${{state[stateKey].includes(m.key)?'checked':''}}>
-        <span>${{m.icon}} ${{m.label}}</span>
+        <span class="mcheck-dot"></span>
+        <span>${{m.label}}</span>
       </label>`).join('')}}`;
 
   // "Select All" checkbox
@@ -994,6 +1045,13 @@ function buildCheckGroup(containerId, stateKey, onChangeFn){{
   allBox.indeterminate = state[stateKey].length > 0 && state[stateKey].length < METRICS.length;
 }}
 
+// ── Chart.js global defaults ────────────────────────────────────────────────
+Chart.defaults.font.family = "'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif";
+Chart.defaults.font.size   = 12;
+Chart.defaults.animation   = {{ duration:900, easing:'easeInOutQuart' }};
+Chart.defaults.plugins.legend.labels.boxWidth = 12;
+Chart.defaults.plugins.legend.labels.padding  = 16;
+
 // ── Trend Chart ─────────────────────────────────────────────────────────────
 function renderTrendChecks(){{
   buildCheckGroup('trend-checks', 'activeMetrics', updateTrend);
@@ -1008,9 +1066,10 @@ function buildTrendDatasets(){{
       const vals = years.map(yr=>aggregate([yr],ctrs)[m.key]||0);
       return {{
         label:m.label, data:vals,
-        borderColor:m.color, backgroundColor:m.color+'22',
-        borderWidth:2.5, pointRadius:4, pointHoverRadius:7,
-        fill:false, tension:0.3,
+        borderColor:m.color, backgroundColor:m.color+'28',
+        borderWidth:3, pointRadius:5, pointHoverRadius:9,
+        pointBackgroundColor:m.color, pointBorderColor:'#fff', pointBorderWidth:2,
+        fill:false, tension:0.4,
         yAxisID: m.key==='grants_value'?'y2':'y1'
       }};
     }})
@@ -1034,9 +1093,9 @@ function initTrend(){{
         }}
       }},
       scales:{{
-        x:{{grid:{{color:'#F1F5F9'}},ticks:{{color:'#64748B'}}}},
-        y1:{{position:'left',grid:{{color:'#F1F5F9'}},ticks:{{color:'#64748B',callback:v=>v>=1000?v/1000+'K':v}}}},
-        y2:{{position:'right',grid:{{drawOnChartArea:false}},ticks:{{color:'#64748B',callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v)}}}}
+        x:{{grid:{{color:'#F0F4F9'}},ticks:{{color:'#6B7280',font:{{size:11}}}}}},
+        y1:{{position:'left',grid:{{color:'#F0F4F9'}},ticks:{{color:'#6B7280',font:{{size:11}},callback:v=>v>=1000000?(v/1000000).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v}}}},
+        y2:{{position:'right',grid:{{drawOnChartArea:false}},ticks:{{color:'#6B7280',font:{{size:11}},callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v)}}}}
       }}
     }}
   }});
@@ -1134,8 +1193,8 @@ function renderGender(){{
   charts.gender = new Chart(ctx,{{
     type:'bar',
     data:{{labels:years,datasets:[
-      {{label:'Male',data:mVals,backgroundColor:'#B8C9D9',borderColor:'#243649',borderWidth:1,borderRadius:3,stack:'g'}},
-      {{label:'Female',data:fVals,backgroundColor:'#FAF0CB',borderColor:'#DFA12C',borderWidth:1,borderRadius:3,stack:'g'}},
+      {{label:'Male',data:mVals,backgroundColor:'#BFDBFE',borderColor:'#3B82F6',borderWidth:1.5,borderRadius:4,stack:'g'}},
+      {{label:'Female',data:fVals,backgroundColor:'#FBCFE8',borderColor:'#EC4899',borderWidth:1.5,borderRadius:4,stack:'g'}},
     ]}},
     options:{{
       responsive:true,maintainAspectRatio:false,
@@ -1146,8 +1205,8 @@ function renderGender(){{
         }}
       }},
       scales:{{
-        x:{{stacked:true,grid:{{color:'#F1F5F9'}},ticks:{{color:'#64748B'}}}},
-        y:{{stacked:true,grid:{{color:'#F1F5F9'}},ticks:{{color:'#64748B',callback:v=>v>=1000?v/1000+'K':v}}}}
+        x:{{stacked:true,grid:{{color:'#F0F4F9'}},ticks:{{color:'#6B7280',font:{{size:11}}}}}},
+        y:{{stacked:true,grid:{{color:'#F0F4F9'}},ticks:{{color:'#6B7280',font:{{size:11}},callback:v=>v>=1000?(v/1000).toFixed(0)+'K':v}}}}
       }}
     }}
   }});
@@ -1183,8 +1242,8 @@ function renderGrants(){{
         }}
       }},
       scales:{{
-        x:{{grid:{{color:'#F1F5F9'}},ticks:{{color:'#64748B',callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v)}}}},
-        y:{{grid:{{display:false}},ticks:{{color:'#64748B',font:{{size:11}}}}}}
+        x:{{grid:{{color:'#F0F4F9'}},ticks:{{color:'#6B7280',font:{{size:11}},callback:v=>'$'+v.toLocaleString()}}}},
+        y:{{grid:{{display:false}},ticks:{{color:'#6B7280',font:{{size:10}}}}}}
       }}
     }}
   }});

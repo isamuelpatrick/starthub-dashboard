@@ -11,34 +11,34 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#EEF2F6;
+  --bg:#F0F4F9;
   --surface:#FFFFFF;
-  --surface2:#F8FAFC;
-  --border:#E2E8F0;
-  --border2:#CBD5E1;
-  --txt:#0F172A;
-  --txt2:#334155;
-  --muted:#64748B;
-  --shadow:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
-  --shadow-md:0 4px 12px rgba(0,0,0,.06),0 2px 4px rgba(0,0,0,.04);
-  --radius:10px;
-  /* Brand primary colours — StartHub Africa Style Guide */
+  --surface2:#F7F9FC;
+  --border:#E3E8F0;
+  --border2:#C9D4E0;
+  --txt:#111827;
+  --txt2:#374151;
+  --muted:#6B7280;
+  --shadow:0 1px 4px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.03);
+  --shadow-md:0 4px 20px rgba(0,0,0,.09),0 2px 6px rgba(0,0,0,.05);
+  --radius:12px;
+  /* Brand structural */
   --brand-navy:#243649;
   --brand-blue:#32579F;
   --brand-gold:#DFA12C;
-  /* Metric accent colours — thematic lineup from brand palette */
-  --c-trained:#243649;
-  --c-tot:#32579F;
-  --c-biz-sup:#DFA12C;
-  --c-biz-sta:#2D6B2A;
-  --c-jobs:#7A1E2E;
-  --c-intern:#3E6B8A;
-  --c-grants-n:#5B9BC4;
-  --c-grants-v:#E8B84B;
+  /* Data colours — full categorical spectrum, max differentiation */
+  --c-trained:#3B82F6;
+  --c-tot:#8B5CF6;
+  --c-biz-sup:#F59E0B;
+  --c-biz-sta:#10B981;
+  --c-jobs:#EF4444;
+  --c-intern:#06B6D4;
+  --c-grants-n:#EC4899;
+  --c-grants-v:#F97316;
   /* Country colours */
-  --uganda:#243649;
-  --tanzania:#DFA12C;
-  --kenya:#32579F;
+  --uganda:#3B82F6;
+  --tanzania:#F59E0B;
+  --kenya:#10B981;
 }
 html{font-size:14px;color-scheme:light}
 body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif;min-height:100vh}
@@ -108,45 +108,67 @@ select{background:transparent;border:none;color:var(--txt);font-size:.8rem;font-
 .updated{font-size:.68rem;color:rgba(255,255,255,.45);margin-left:auto;white-space:nowrap}
 
 /* ── Layout ── */
-#main{padding:20px 24px;max-width:1600px;margin:0 auto}
-.sec-label{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+#main{padding:22px 28px;max-width:1600px;margin:0 auto}
+.sec-label{
+  font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--brand-navy);margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.sec-label::before{content:'';width:4px;height:14px;background:var(--brand-gold);border-radius:2px;flex-shrink:0}
 .sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
-.mb{margin-bottom:22px}
+.mb{margin-bottom:26px}
 
-/* ── KPI Cards ── */
-#kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px}
+/* ── KPI Cards — bento grid ── */
+#kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:1000px){#kpi-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){#kpi-grid{grid-template-columns:1fr}}
 .kpi{
   background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:14px 16px;border-top:3px solid var(--accent,#243649);
-  box-shadow:var(--shadow);transition:box-shadow .15s,transform .15s;
+  padding:18px 20px 16px 22px;border-left:4px solid var(--accent,#3B82F6);
+  box-shadow:var(--shadow);transition:box-shadow .2s,transform .2s;
+  position:relative;overflow:hidden;
 }
-.kpi:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
-.kpi-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px}
-.kpi-value{font-size:1.75rem;font-weight:800;color:var(--txt);line-height:1;font-variant-numeric:tabular-nums}
-.kpi-sub{font-size:.68rem;color:var(--muted);margin-top:5px;display:flex;gap:8px;flex-wrap:wrap}
-.badge{display:inline-flex;align-items:center;gap:3px;font-size:.65rem;font-weight:600;padding:2px 6px;border-radius:4px}
-.badge-m{background:#D1DCE9;color:#243649}
-.badge-f{background:#FAF0CB;color:#8A5E00}
+.kpi.hero{grid-column:span 2}
+.kpi::before{
+  content:'';position:absolute;top:0;right:0;width:120px;height:100%;
+  background:linear-gradient(to left,var(--accent-bg,transparent),transparent);
+  pointer-events:none;
+}
+.kpi:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.kpi-label{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
+.kpi-value{font-size:2.1rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.kpi.hero .kpi-value{font-size:2.6rem}
+.kpi-sub{font-size:.68rem;color:var(--muted);margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:20px}
+.badge-m{background:#DBEAFE;color:#1E40AF}
+.badge-f{background:#FCE7F3;color:#9D174D}
 
 /* ── Chart cards ── */
-.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
-.chart-card h3{font-size:.82rem;font-weight:700;color:var(--txt);margin-bottom:2px}
-.chart-meta{font-size:.68rem;color:var(--muted);margin-bottom:12px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}
+.chart-card h3{font-size:.9rem;font-weight:700;color:var(--txt);margin-bottom:3px}
+.chart-meta{font-size:.69rem;color:var(--muted);margin-bottom:14px}
 .chart-wrap canvas{width:100%!important}
-.charts-2{display:grid;grid-template-columns:2fr 1fr;gap:14px}
-.charts-eq{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.charts-2{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.charts-eq{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:900px){.charts-2,.charts-eq{grid-template-columns:1fr}}
 
 /* ── Metric Checkboxes ── */
-.mcheck-group{display:flex;flex-wrap:wrap;gap:6px 14px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px}
-.mcheck-item{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;white-space:nowrap}
-.mcheck-item input[type=checkbox]{
-  width:15px;height:15px;cursor:pointer;accent-color:var(--chk-col,#32579F);
-  flex-shrink:0;
+.mcheck-group{display:flex;flex-wrap:wrap;gap:4px 8px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px}
+.mcheck-item{
+  display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;white-space:nowrap;
+  padding:4px 10px;border-radius:20px;border:1.5px solid transparent;
+  transition:background .12s,border-color .12s;
 }
-.mcheck-item span{font-size:.72rem;font-weight:600;color:var(--txt2)}
+.mcheck-item:has(input:checked){background:var(--surface);border-color:var(--border2);box-shadow:var(--shadow)}
+.mcheck-item:hover{background:var(--surface);border-color:var(--border)}
+.mcheck-item input[type=checkbox]{display:none}
+.mcheck-dot{width:10px;height:10px;border-radius:50%;background:var(--chk-col,#3B82F6);flex-shrink:0;opacity:.4;transition:opacity .12s}
+.mcheck-item:has(input:checked) .mcheck-dot{opacity:1}
+.mcheck-item span{font-size:.72rem;font-weight:600;color:var(--muted)}
+.mcheck-item:has(input:checked) span{color:var(--txt2)}
+.mcheck-item.all-item{background:var(--surface);border-color:var(--border2)}
 .mcheck-item.all-item span{font-weight:700;color:var(--txt)}
-.mcheck-sep{width:1px;background:var(--border);align-self:stretch;margin:0 4px}
+.mcheck-sep{display:none}
 
 /* ── Country Metrics Table ── */
 .country-metrics-table{width:100%;border-collapse:collapse;font-size:.76rem}
@@ -420,39 +442,39 @@ select{background:transparent;border:none;color:var(--txt);font-size:.8rem;font-
 const DATA = {"updated":"2026-06-11","years":{"2017-19":{"totals":{"trained_m":0,"trained_f":0,"trained_total":600.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"countries":{"Uganda":{"totals":{"trained_m":0,"trained_f":0,"trained_total":600.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]},"Tanzania":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]},"Kenya":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]}},"monthly":{}},"2020":{"totals":{"trained_m":221.0,"trained_f":168.0,"trained_total":489.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":7.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":6.0,"grants_value":1300.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"countries":{"Uganda":{"totals":{"trained_m":221.0,"trained_f":168.0,"trained_total":489.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":7.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":6.0,"grants_value":1300.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[{"name":"SmarterThanCorona Hackathon","country":"Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":100.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Universities - Online Entrepreneurship Academy","country":"Uganda","metrics":{"trained_m":33.0,"trained_f":16.0,"trained_total":49.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":6.0,"grants_value":1300.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"StartHub Catalyzer","country":"Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":7.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Masterclass 1 Ideation","country":"Uganda","metrics":{"trained_m":33.0,"trained_f":18.0,"trained_total":51.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Masterclass 2 Ideation","country":"Uganda","metrics":{"trained_m":48.0,"trained_f":37.0,"trained_total":85.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Masterclass 3 One Page Business Plan","country":"Uganda","metrics":{"trained_m":37.0,"trained_f":35.0,"trained_total":72.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Masterclasses 4 Fundraising","country":"Uganda","metrics":{"trained_m":55.0,"trained_f":27.0,"trained_total":82.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Masterclasses 5 How to get started (female only)","country":"Uganda","metrics":{"trained_m":0.0,"trained_f":20.0,"trained_total":20.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Masterclasses 6 How to tackle break-down as an entrepreneur","country":"Uganda","metrics":{"trained_m":15.0,"trained_f":15.0,"trained_total":30.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Tanzania":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]},"Kenya":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]}},"monthly":{}},"2021":{"totals":{"trained_m":170.0,"trained_f":159.0,"trained_total":349.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":23.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":8.0,"grants_value":30000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"countries":{"Uganda":{"totals":{"trained_m":170.0,"trained_f":159.0,"trained_total":349.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":23.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":8.0,"grants_value":30000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[{"name":"University Academy","country":"Uganda","metrics":{"trained_m":51.0,"trained_f":25.0,"trained_total":76.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Female Founders Bootcamp at Universities","country":"Uganda","metrics":{"trained_m":0,"trained_f":20.0,"trained_total":20.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Ideathons at Universities","country":"Uganda","metrics":{"trained_m":32.0,"trained_f":49.0,"trained_total":81.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Business Recovery Clinics (Online Sessions)","country":"Uganda","metrics":{"trained_m":87.0,"trained_f":65.0,"trained_total":152.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Catalyzer","country":"Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":15.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"DHRLab - Digital Innovations for Business Resilience (Sep 2020 - Dec 2021)","country":"Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":20.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":8.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":8.0,"grants_value":30000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Tanzania":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]},"Kenya":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]}},"monthly":{}},"2022":{"totals":{"trained_m":0,"trained_f":0,"trained_total":1012.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":178.0,"biz_started":0,"jobs":0,"internships":243.0,"grants_count":41.0,"grants_value":54540.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"countries":{"Uganda":{"totals":{"trained_m":0,"trained_f":0,"trained_total":1012.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":178.0,"biz_started":0,"jobs":0,"internships":243.0,"grants_count":41.0,"grants_value":54540.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[{"name":"Nisat - Trainings for SMEs in Agroecology and Ecotourism","country":"Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":60.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":23.0,"grants_value":25000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Digital Innovations for Business Resilience","country":"Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":300.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":120.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":12.0,"grants_value":22000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"JRS Business Trainings","country":"Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":250.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":52.0,"biz_started":0,"jobs":0,"internships":198.0,"grants_count":0,"grants_value":6240.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"University Program (Ideathons, Bootcamp, Pitch-Event)","country":"Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":402.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":6.0,"biz_started":0,"jobs":0,"internships":45.0,"grants_count":6.0,"grants_value":1300.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Tanzania":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]},"Kenya":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]}},"monthly":{}},"2023":{"totals":{"trained_m":194.0,"trained_f":376.0,"trained_total":907.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":253.0,"biz_started":0.0,"jobs":0,"internships":30.0,"grants_count":12.0,"grants_value":78430.0,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":0.0},"countries":{"Uganda":{"totals":{"trained_m":191.0,"trained_f":276.0,"trained_total":804.0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":253.0,"biz_started":0,"jobs":0,"internships":30.0,"grants_count":12.0,"grants_value":78430.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[{"name":"Universities Uganda","metrics":{"trained_m":0,"trained_f":0,"trained_total":307.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":4.0,"grants_value":2500.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Hi Innovator","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":14.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":3.0,"grants_value":60000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"SheTechs The Future","metrics":{"trained_m":0,"trained_f":32.0,"trained_total":32.0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":11.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Open Innovations Program (OIP)","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":15.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Innovate for Employment (I4E)","metrics":{"trained_m":0,"trained_f":0,"trained_total":30.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":30.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Greenovation","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":6.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":5.0,"grants_value":15930.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Women In Manufacturing","metrics":{"trained_m":0,"trained_f":10.0,"trained_total":10.0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":10.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Empower YOU","metrics":{"trained_m":110.0,"trained_f":87.0,"trained_total":197.0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":197.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"JRS","metrics":{"trained_m":81.0,"trained_f":147.0,"trained_total":228.0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Tanzania":{"totals":{"trained_m":3.0,"trained_f":100.0,"trained_total":103.0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[{"name":"She Techs The future Ideathon + Bootcamp","metrics":{"trained_m":3.0,"trained_f":100.0,"trained_total":103.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":9.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Kenya":{"totals":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[]}},"monthly":{}},"2024":{"totals":{"trained_m":1298.0,"trained_f":1082.0,"trained_total":2380.0,"tot_m":165.0,"tot_f":100.0,"tot_total":265.0,"biz_supported":617.0,"biz_started":42.0,"jobs":104.0,"internships":105.0,"grants_count":35.0,"grants_value":40964.32,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":4.0},"countries":{"Uganda":{"totals":{"trained_m":1075.0,"trained_f":956.0,"trained_total":2031.0,"tot_m":155.0,"tot_f":91.0,"tot_total":246.0,"biz_supported":587.0,"biz_started":34.0,"jobs":104.0,"internships":105.0,"grants_count":15.0,"grants_value":11324.32,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[{"name":"Universities: Future Founders Program","metrics":{"trained_m":10.0,"trained_f":4.0,"trained_total":14.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":1.0,"biz_started":8.0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":5555.56,"cohort_companies":9.0}},{"name":"Universities: Startup 101 - Kabale University","metrics":{"trained_m":21.0,"trained_f":10.0,"trained_total":31.0,"tot_m":4.0,"tot_f":2.0,"tot_total":6.0,"biz_supported":0,"biz_started":10.0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":66.67,"cohort_companies":0}},{"name":"Universities: UCOBS Project 5 - Level 2 Training - MUST","metrics":{"trained_m":14.0,"trained_f":6.0,"trained_total":20.0,"tot_m":3.0,"tot_f":4.0,"tot_total":7.0,"biz_supported":8.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":3.0,"grants_value":405.41,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Universities: CITT - Product Development Training - MUST","metrics":{"trained_m":26.0,"trained_f":7.0,"trained_total":33.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":10.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0.0,"revenue_endline":0,"cohort_companies":0}},{"name":"Catalyzer Startups","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":11.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":8457.0,"revenue_endline":11437.0,"cohort_companies":12.0}},{"name":"Empower YOU","metrics":{"trained_m":202.0,"trained_f":235.0,"trained_total":437.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":56.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":5135.14,"revenue_baseline":55546.0,"revenue_endline":59360.0,"cohort_companies":61.0}},{"name":"I4FS Uganda","metrics":{"trained_m":97.0,"trained_f":59.0,"trained_total":156.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":21.0,"biz_started":7.0,"jobs":0,"internships":0,"grants_count":4.0,"grants_value":810.81,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"I4FS Tanzania","metrics":{"trained_m":86.0,"trained_f":24.0,"trained_total":110.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":25.0,"biz_started":9.0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"I4E","metrics":{"trained_m":19.0,"trained_f":39.0,"trained_total":58.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":41.0,"internships":58.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"WFP Isingiro","metrics":{"trained_m":49.0,"trained_f":89.0,"trained_total":138.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":138.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"WFP Adjumani","metrics":{"trained_m":112.0,"trained_f":191.0,"trained_total":303.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":303.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"KAS (Y4P)","metrics":{"trained_m":6.0,"trained_f":2.0,"trained_total":8.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Stanbic national schools championship","metrics":{"trained_m":171.0,"trained_f":127.0,"trained_total":298.0,"tot_m":85.0,"tot_f":51.0,"tot_total":136.0,"biz_supported":14.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"ILO Online Gig Work Program","metrics":{"trained_m":137.0,"trained_f":81.0,"trained_total":218.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":63.0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0.0,"revenue_endline":3218.0,"cohort_companies":130.0}},{"name":"UNICEF - Internship for Young People","metrics":{"trained_m":21.0,"trained_f":29.0,"trained_total":50.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":47.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"WFP FSQ","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":40.0,"tot_f":23.0,"tot_total":63.0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"WFP Innovation Capacity Training Karamoja","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":9.0,"tot_f":5.0,"tot_total":14.0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Green Growth Agri Hackathon","metrics":{"trained_m":84.0,"trained_f":25.0,"trained_total":109.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":8.0,"grants_value":4972.97,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"WFP Arua","metrics":{"trained_m":0,"trained_f":0,"trained_total":0,"tot_m":14.0,"tot_f":6.0,"tot_total":20.0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"RUFORUM Namibia","metrics":{"trained_m":20.0,"trained_f":28.0,"trained_total":48.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Tanzania":{"totals":{"trained_m":209.0,"trained_f":124.0,"trained_total":333.0,"tot_m":10.0,"tot_f":9.0,"tot_total":19.0,"biz_supported":30.0,"biz_started":6.0,"jobs":0.0,"internships":0.0,"grants_count":20.0,"grants_value":29640.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[{"name":"Startup 101 Cohort 2","metrics":{"trained_m":19.0,"trained_f":8.0,"trained_total":27.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":6.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0.0,"revenue_endline":546000.0,"cohort_companies":6.0}},{"name":"UNDP (#YouthIgnite) Ideathon","metrics":{"trained_m":173.0,"trained_f":103.0,"trained_total":276.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"UNDP (#YouthIgnite) Bootcamp","metrics":{"trained_m":17.0,"trained_f":13.0,"trained_total":30.0,"tot_m":10.0,"tot_f":9.0,"tot_total":19.0,"biz_supported":30.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":20.0,"grants_value":29640.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Kenya":{"totals":{"trained_m":14.0,"trained_f":2.0,"trained_total":16.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0,"biz_started":2.0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{},"projects":[{"name":"0.1% Founders Program","metrics":{"trained_m":14.0,"trained_f":2.0,"trained_total":16.0,"tot_m":0,"tot_f":0,"tot_total":0.0,"biz_supported":9.0,"biz_started":2.0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":4.0}}]}},"monthly":{}},"2025":{"totals":{"trained_m":1338.0,"trained_f":1024.0,"trained_total":2362.0,"tot_m":190.0,"tot_f":102.0,"tot_total":292.0,"biz_supported":108.0,"biz_started":99.0,"jobs":0.0,"internships":0.0,"grants_count":124.0,"grants_value":97740.0,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":0.0},"countries":{"Uganda":{"totals":{"trained_m":851.0,"trained_f":726.0,"trained_total":1577.0,"tot_m":190.0,"tot_f":102.0,"tot_total":292.0,"biz_supported":96.0,"biz_started":66.0,"jobs":0.0,"internships":0.0,"grants_count":112.0,"grants_value":79740.0,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":0.0},"monthly":{"Jan":{"trained_m":74.0,"trained_f":44.0,"trained_total":118.0,"tot_total":24.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Feb":{"trained_m":50.0,"trained_f":28.0,"trained_total":78.0,"tot_total":12.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Mar":{"trained_m":34.0,"trained_f":34.0,"trained_total":68.0,"tot_total":0.0,"biz_supported":16.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Apr":{"trained_m":26.0,"trained_f":17.0,"trained_total":43.0,"tot_total":174.0,"biz_supported":24.0,"biz_started":56.0,"jobs":0.0,"internships":0.0},"May":{"trained_m":176.0,"trained_f":136.0,"trained_total":312.0,"tot_total":0.0,"biz_supported":15.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jun":{"trained_m":83.0,"trained_f":83.0,"trained_total":166.0,"tot_total":19.0,"biz_supported":19.0,"biz_started":10.0,"jobs":0.0,"internships":0.0},"Jul":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Aug":{"trained_m":12.0,"trained_f":10.0,"trained_total":22.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Sep":{"trained_m":257.0,"trained_f":261.0,"trained_total":518.0,"tot_total":14.0,"biz_supported":3.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Oct":{"trained_m":121.0,"trained_f":94.0,"trained_total":215.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Nov":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":49.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Dec":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0}},"projects":[{"name":"ABED","metrics":{"trained_m":74.0,"trained_f":44.0,"trained_total":118.0,"tot_m":17.0,"tot_f":7.0,"tot_total":24.0,"biz_supported":4.0,"biz_started":17.0,"jobs":0.0,"internships":0.0,"grants_count":5.0,"grants_value":3300.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"MUST Digital Marketing SKills Program","metrics":{"trained_m":25.0,"trained_f":12.0,"trained_total":37.0,"tot_m":8.0,"tot_f":4.0,"tot_total":12.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Innovate 4 Food Security","metrics":{"trained_m":57.0,"trained_f":39.0,"trained_total":96.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":40.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":11.0,"grants_value":3676.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Stanbic National Schools Championship","metrics":{"trained_m":174.0,"trained_f":133.0,"trained_total":307.0,"tot_m":118.0,"tot_f":56.0,"tot_total":174.0,"biz_supported":11.0,"biz_started":38.0,"jobs":0.0,"internships":0.0,"grants_count":11.0,"grants_value":26470.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Empower You","metrics":{"trained_m":225.0,"trained_f":217.0,"trained_total":442.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":19.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":82.0,"grants_value":20294.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"UCU Students Innovation Challenge","metrics":{"trained_m":13.0,"trained_f":9.0,"trained_total":22.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":9.0,"biz_started":1.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Building Bridges GIZ","metrics":{"trained_m":20.0,"trained_f":43.0,"trained_total":63.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"NUTSEP","metrics":{"trained_m":53.0,"trained_f":30.0,"trained_total":83.0,"tot_m":21.0,"tot_f":12.0,"tot_total":33.0,"biz_supported":10.0,"biz_started":10.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Nutrition 4 Business","metrics":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":3.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":3.0,"grants_value":26000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"MUK Environmental Innovations & Technopreneurship","metrics":{"trained_m":18.0,"trained_f":19.0,"trained_total":37.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"UCU SUESCA Ideathons","metrics":{"trained_m":192.0,"trained_f":180.0,"trained_total":372.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"UMU SUESCA - Curriculum Development Workshop","metrics":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_m":26.0,"tot_f":23.0,"tot_total":49.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Tanzania":{"totals":{"trained_m":434.0,"trained_f":266.0,"trained_total":700.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":29.0,"jobs":0.0,"internships":0.0,"grants_count":0.0,"grants_value":0.0,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":0},"monthly":{"Jan":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Feb":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Mar":{"trained_m":23.0,"trained_f":13.0,"trained_total":36.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Apr":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"May":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jun":{"trained_m":273.0,"trained_f":221.0,"trained_total":494.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jul":{"trained_m":115.0,"trained_f":25.0,"trained_total":140.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":29.0,"jobs":0.0,"internships":0.0},"Aug":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Sep":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Oct":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Nov":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Dec":{"trained_m":23.0,"trained_f":7.0,"trained_total":30.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0}},"projects":[{"name":"UNDP Youth Ignite Cohort 2","metrics":{"trained_m":23.0,"trained_f":7.0,"trained_total":30.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"SUA","metrics":{"trained_m":17.0,"trained_f":9.0,"trained_total":26.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"S101","metrics":{"trained_m":121.0,"trained_f":29.0,"trained_total":150.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":29.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"CRDB","metrics":{"trained_m":273.0,"trained_f":221.0,"trained_total":494.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Kenya":{"totals":{"trained_m":53.0,"trained_f":32.0,"trained_total":85.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":12.0,"biz_started":4.0,"jobs":0.0,"internships":0.0,"grants_count":12.0,"grants_value":18000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{"Jan":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Feb":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Mar":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Apr":{"trained_m":12.0,"trained_f":5.0,"trained_total":17.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"May":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jun":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jul":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Aug":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Sep":{"trained_m":41.0,"trained_f":27.0,"trained_total":68.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Oct":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Nov":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Dec":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0}},"projects":[{"name":"Moringa Bootcamp","metrics":{"trained_m":12.0,"trained_f":5.0,"trained_total":17.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Startup 0.1% Founders","metrics":{"trained_m":12.0,"trained_f":5.0,"trained_total":17.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"WFP Peace Building","metrics":{"trained_m":29.0,"trained_f":22.0,"trained_total":51.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":12.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":12.0,"grants_value":18000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]}},"monthly":{"Jan":{"trained_m":74.0,"trained_f":44.0,"trained_total":118.0,"tot_total":24.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Feb":{"trained_m":50.0,"trained_f":28.0,"trained_total":78.0,"tot_total":12.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Mar":{"trained_m":57.0,"trained_f":47.0,"trained_total":104.0,"tot_total":0.0,"biz_supported":16.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Apr":{"trained_m":38.0,"trained_f":22.0,"trained_total":60.0,"tot_total":174.0,"biz_supported":24.0,"biz_started":56.0,"jobs":0.0,"internships":0.0},"May":{"trained_m":176.0,"trained_f":136.0,"trained_total":312.0,"tot_total":0.0,"biz_supported":15.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jun":{"trained_m":356.0,"trained_f":304.0,"trained_total":660.0,"tot_total":19.0,"biz_supported":19.0,"biz_started":10.0,"jobs":0.0,"internships":0.0},"Jul":{"trained_m":115.0,"trained_f":25.0,"trained_total":140.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":29.0,"jobs":0.0,"internships":0.0},"Aug":{"trained_m":12.0,"trained_f":10.0,"trained_total":22.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Sep":{"trained_m":298.0,"trained_f":288.0,"trained_total":586.0,"tot_total":14.0,"biz_supported":3.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Oct":{"trained_m":121.0,"trained_f":94.0,"trained_total":215.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Nov":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":49.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Dec":{"trained_m":23.0,"trained_f":7.0,"trained_total":30.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0}}},"2026":{"totals":{"trained_m":771.0,"trained_f":881.0,"trained_total":1652.0,"tot_m":132.0,"tot_f":63.0,"tot_total":195.0,"biz_supported":277.0,"biz_started":122.0,"jobs":0.0,"internships":11.0,"grants_count":109.0,"grants_value":146055.09,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":37.0},"countries":{"Uganda":{"totals":{"trained_m":753.0,"trained_f":865.0,"trained_total":1618.0,"tot_m":132.0,"tot_f":63.0,"tot_total":195.0,"biz_supported":275.0,"biz_started":121.0,"jobs":0.0,"internships":11.0,"grants_count":57.0,"grants_value":83266.0,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":37.0},"monthly":{"Jan":{"trained_m":212.0,"trained_f":283.0,"trained_total":495.0,"tot_total":0.0,"biz_supported":18.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Feb":{"trained_m":36.0,"trained_f":38.0,"trained_total":74.0,"tot_total":8.0,"biz_supported":27.0,"biz_started":2.0,"jobs":0.0,"internships":6.0},"Mar":{"trained_m":55.0,"trained_f":48.0,"trained_total":103.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":16.0,"jobs":0.0,"internships":0.0},"Apr":{"trained_m":200.0,"trained_f":342.0,"trained_total":542.0,"tot_total":0.0,"biz_supported":92.0,"biz_started":103.0,"jobs":0.0,"internships":0.0},"May":{"trained_m":250.0,"trained_f":154.0,"trained_total":404.0,"tot_total":187.0,"biz_supported":138.0,"biz_started":0.0,"jobs":0.0,"internships":5.0},"Jun":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jul":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Aug":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Sep":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Oct":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Nov":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Dec":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0}},"projects":[{"name":"WeWork","metrics":{"trained_m":28.0,"trained_f":41.0,"trained_total":69.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":24.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":21.0,"grants_value":10884.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"I-Upshift","metrics":{"trained_m":194.0,"trained_f":308.0,"trained_total":502.0,"tot_m":4.0,"tot_f":4.0,"tot_total":8.0,"biz_supported":116.0,"biz_started":119.0,"jobs":0.0,"internships":11.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"WFP BDS Katakwi","metrics":{"trained_m":212.0,"trained_f":283.0,"trained_total":495.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":18.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":18.0,"grants_value":70000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":37.0}},{"name":"Tech Wings Africa","metrics":{"trained_m":5.0,"trained_f":2.0,"trained_total":7.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":3.0,"biz_started":2.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Africa Climate Collaborative - MUK","metrics":{"trained_m":19.0,"trained_f":11.0,"trained_total":30.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"UCU Students Innovation Challenge","metrics":{"trained_m":18.0,"trained_f":8.0,"trained_total":26.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Market Access Program","metrics":{"trained_m":40.0,"trained_f":71.0,"trained_total":111.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":104.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"Stanbic NSC Season 11","metrics":{"trained_m":237.0,"trained_f":141.0,"trained_total":378.0,"tot_m":128.0,"tot_f":59.0,"tot_total":187.0,"biz_supported":10.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":18.0,"grants_value":2382.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Tanzania":{"totals":{"trained_m":15.0,"trained_f":14.0,"trained_total":29.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":52.0,"grants_value":62789.09,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{"Jan":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Feb":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Mar":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Apr":{"trained_m":15.0,"trained_f":14.0,"trained_total":29.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"May":{"trained_m":3.0,"trained_f":14.0,"trained_total":17.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jun":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jul":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Aug":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Sep":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Oct":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Nov":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Dec":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0}},"projects":[{"name":"YouthIgnite Cohort 2","metrics":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":20.0,"grants_value":29514.56,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"S101 Cohort 3","metrics":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":3.0,"grants_value":582.52,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"YouthIgnite Cohort 3","metrics":{"trained_m":15.0,"trained_f":14.0,"trained_total":29.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0,"grants_count":29.0,"grants_value":32692.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}},{"name":"AYP Programme Fundamental training","metrics":{"trained_m":3.0,"trained_f":14.0,"trained_total":17.0,"tot_m":0,"tot_f":0,"tot_total":0,"biz_supported":0.0,"biz_started":0,"jobs":0,"internships":0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]},"Kenya":{"totals":{"trained_m":3.0,"trained_f":2.0,"trained_total":5.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":2.0,"biz_started":1.0,"jobs":0.0,"internships":0.0,"grants_count":0.0,"grants_value":0.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0},"monthly":{"Jan":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Feb":{"trained_m":3.0,"trained_f":2.0,"trained_total":5.0,"tot_total":0.0,"biz_supported":2.0,"biz_started":1.0,"jobs":0.0,"internships":0.0},"Mar":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Apr":{"trained_m":0.0,"trained_f":0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"May":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jun":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jul":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Aug":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Sep":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Oct":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Nov":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Dec":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0}},"projects":[{"name":"Tech Wings Africa","metrics":{"trained_m":3.0,"trained_f":2.0,"trained_total":5.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":2.0,"biz_started":1.0,"jobs":0.0,"internships":0.0,"grants_count":0,"grants_value":0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}]}},"monthly":{"Jan":{"trained_m":212.0,"trained_f":283.0,"trained_total":495.0,"tot_total":0.0,"biz_supported":18.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Feb":{"trained_m":39.0,"trained_f":40.0,"trained_total":79.0,"tot_total":8.0,"biz_supported":29.0,"biz_started":3.0,"jobs":0.0,"internships":6.0},"Mar":{"trained_m":55.0,"trained_f":48.0,"trained_total":103.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":16.0,"jobs":0.0,"internships":0.0},"Apr":{"trained_m":215.0,"trained_f":356.0,"trained_total":571.0,"tot_total":0.0,"biz_supported":92.0,"biz_started":103.0,"jobs":0.0,"internships":0.0},"May":{"trained_m":253.0,"trained_f":168.0,"trained_total":421.0,"tot_total":187.0,"biz_supported":138.0,"biz_started":0.0,"jobs":0.0,"internships":5.0},"Jun":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Jul":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Aug":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Sep":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Oct":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Nov":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0},"Dec":{"trained_m":0.0,"trained_f":0.0,"trained_total":0.0,"tot_total":0.0,"biz_supported":0.0,"biz_started":0.0,"jobs":0.0,"internships":0.0}}}},"overall":{"all":{"trained_m":3992.0,"trained_f":3690.0,"trained_total":9751.0,"tot_m":487.0,"tot_f":265.0,"tot_total":752.0,"biz_supported":1463.0,"biz_started":263.0,"jobs":104.0,"internships":389.0,"grants_count":335.0,"grants_value":449029.41000000003,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":41.0},"countries":{"Uganda":{"trained_m":3261.0,"trained_f":3150.0,"trained_total":8480.0,"tot_m":477.0,"tot_f":256.0,"tot_total":733.0,"biz_supported":1419.0,"biz_started":221.0,"jobs":104.0,"internships":389.0,"grants_count":251.0,"grants_value":338600.32,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":37.0},"Tanzania":{"trained_m":661.0,"trained_f":504.0,"trained_total":1165.0,"tot_m":10.0,"tot_f":9.0,"tot_total":19.0,"biz_supported":30.0,"biz_started":35.0,"jobs":0.0,"internships":0.0,"grants_count":72.0,"grants_value":92429.09,"revenue_baseline":0.0,"revenue_endline":0.0,"cohort_companies":0},"Kenya":{"trained_m":70.0,"trained_f":36.0,"trained_total":106.0,"tot_m":0.0,"tot_f":0.0,"tot_total":0.0,"biz_supported":14.0,"biz_started":7.0,"jobs":0.0,"internships":0.0,"grants_count":12.0,"grants_value":18000.0,"revenue_baseline":0,"revenue_endline":0,"cohort_companies":0}}}};
 
 // ── Config ─────────────────────────────────────────────────────────────────
-// Brand thematic colour lineup — Blue One → Blue Two → Gold → Green → Burgundy → tints
+// Categorical palette — maximally distinct hues, ordered by importance for bento layout
+// Row 1: Trained(hero×2) | Biz Supported | Biz Started
+// Row 2: Jobs | Internships | Grants USD(hero×2)
+// Row 3: Training of Trainers(hero×2) | Grants Count(hero×2)
 const METRICS = [
-  {key:'trained_total', label:'Trained',             icon:'🎓', color:'#243649', prefix:''},
-  {key:'tot_total',     label:'Training of Trainers',icon:'📚', color:'#32579F', prefix:''},
-  {key:'biz_supported', label:'Biz Supported',       icon:'🏢', color:'#DFA12C', prefix:''},
-  {key:'biz_started',   label:'Biz Started',         icon:'🚀', color:'#2D6B2A', prefix:''},
-  {key:'jobs',          label:'Jobs Placed',          icon:'💼', color:'#7A1E2E', prefix:''},
-  {key:'internships',   label:'Internships',          icon:'📋', color:'#3E6B8A', prefix:''},
-  {key:'grants_count',  label:'Grants (count)',       icon:'🏷️', color:'#5B9BC4', prefix:''},
-  {key:'grants_value',  label:'Grants (USD)',         icon:'💰', color:'#E8B84B', prefix:'$'},
+  {key:'trained_total', label:'Entrepreneurs Trained', icon:'🎓', color:'#3B82F6', prefix:'',  hero:true},
+  {key:'biz_supported', label:'Biz Supported',         icon:'🏢', color:'#F59E0B', prefix:'',  hero:false},
+  {key:'biz_started',   label:'Biz Started',           icon:'🚀', color:'#10B981', prefix:'',  hero:false},
+  {key:'jobs',          label:'Jobs Placed',            icon:'💼', color:'#EF4444', prefix:'',  hero:false},
+  {key:'internships',   label:'Internships',            icon:'📋', color:'#06B6D4', prefix:'',  hero:false},
+  {key:'grants_value',  label:'Grants (USD)',           icon:'💰', color:'#F97316', prefix:'$', hero:true},
+  {key:'tot_total',     label:'Training of Trainers',  icon:'📚', color:'#8B5CF6', prefix:'',  hero:true},
+  {key:'grants_count',  label:'Grants Awarded',        icon:'🏷️', color:'#EC4899', prefix:'',  hero:true},
 ];
 const METRIC_MAP = Object.fromEntries(METRICS.map(m=>[m.key,m]));
 
-// Country colours from brand palette
-const COUNTRY_COLORS = {Uganda:'#243649', Tanzania:'#DFA12C', Kenya:'#32579F'};
-const COUNTRY_BG     = {Uganda:'#E6EAF0', Tanzania:'#FDF5E1', Kenya:'#E7EBF6'};
+// Country colours — vivid, distinct
+const COUNTRY_COLORS = {Uganda:'#3B82F6', Tanzania:'#F59E0B', Kenya:'#10B981'};
+const COUNTRY_BG     = {Uganda:'#EFF6FF', Tanzania:'#FFFBEB', Kenya:'#ECFDF5'};
 const COUNTRIES = ['Uganda','Tanzania','Kenya'];
 
-// Brand-derived pastel tints for project columns
-// Groups: Blue One tints · Blue Two tints · Gold tints · Green tints · Burgundy tints (×4 each)
+// Categorical pastel backgrounds and borders for project columns
 const PROJ_BG = [
-  '#E6EAF0','#D1DCE9','#B8C9D9','#9FB6CA',
-  '#E7EBF6','#D1D9EE','#BAC9E6','#A3B8DE',
-  '#FDF5E1','#FAF0CB','#F7E8B0','#F4DF95',
-  '#E7F1E7','#D1E6D1','#BDDABD','#A9CEA9',
-  '#F2E7EA','#E6D1D5','#DABAC1','#CEA4AD',
+  '#EFF6FF','#F5F3FF','#FFFBEB','#ECFDF5','#FEF2F2',
+  '#ECFEFF','#FDF2F8','#FFF7ED','#F0F9FF','#F0FDF4',
+  '#EEF2FF','#FFF1F2','#FEFCE8','#F0FDFA','#FAF5FF',
+  '#FFF8F0','#F0F4FF','#FFFAF0','#F5FFFA','#FFF0F5',
 ];
 const PROJ_BORDER = [
-  '#3E6B8A','#32579F','#243649','#1A2E40',
-  '#32579F','#4A6FC0','#6283C8','#7A97D0',
-  '#DFA12C','#E8B84B','#F0CC70','#F5DC95',
-  '#2D6B2A','#4A9B45','#68B060','#86C57B',
-  '#7A1E2E','#9B3040','#BC4255','#D4647A',
+  '#3B82F6','#8B5CF6','#F59E0B','#10B981','#EF4444',
+  '#06B6D4','#EC4899','#F97316','#6366F1','#22C55E',
+  '#818CF8','#FB7185','#FCD34D','#34D399','#60A5FA',
+  '#FB923C','#A78BFA','#FCA5A5','#6EE7B7','#93C5FD',
 ];
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -564,6 +586,10 @@ function getProjects(drillCountry){
       if(drillCountry!=='all'&&c!==drillCountry) continue;
       if(!headerCtrs.includes(c)) continue;
       for(const p of (yd.countries?.[c]?.projects||[])){
+        // Apply programme filter (state.activeProjects) if set
+        if(state.activeProjects){
+          if(!state.activeProjects.has(normName(p.name).toLowerCase())) continue;
+        }
         // normalise key: lowercase + trim → merges capitalisation variants
         const key = normName(p.name).toLowerCase()+'||'+c;
         if(map[key]){
@@ -580,30 +606,55 @@ function getProjects(drillCountry){
   return Object.values(map);
 }
 
+// ── Count-up animation ────────────────────────────────────────────────────
+function countUp(el, target, prefix, duration){
+  const start = performance.now();
+  function step(now){
+    const p = Math.min((now-start)/duration,1);
+    const ease = 1-Math.pow(1-p,3); // ease-out cubic
+    const v = Math.round(target*ease);
+    el.textContent = prefix + v.toLocaleString();
+    if(p<1) requestAnimationFrame(step);
+    else el.textContent = prefix + target.toLocaleString();
+  }
+  requestAnimationFrame(step);
+}
+
 // ── KPI Cards ─────────────────────────────────────────────────────────────
 function renderKPI(){
   const m = getFiltered();
   const rows = METRICS.map(met=>{
-    const v = m[met.key]||0;
+    const v = Math.round(m[met.key]||0);
     let sub = '';
     if(met.key==='trained_total'){
       const tm=m.trained_m||0, tf=m.trained_f||0;
-      if(tm||tf) sub=`<span class="badge badge-m">♂ ${fmtFull(tm)}</span><span class="badge badge-f">♀ ${fmtFull(tf)}</span>`;
+      if(tm||tf) sub=`<span class="badge badge-m">♂ ${Math.round(tm).toLocaleString()}</span>`+
+                     `<span class="badge badge-f">♀ ${Math.round(tf).toLocaleString()}</span>`;
     }
     if(met.key==='tot_total'){
       const tm=m.tot_m||0, tf=m.tot_f||0;
-      if(tm||tf) sub=`<span class="badge badge-m">♂ ${fmtFull(tm)}</span><span class="badge badge-f">♀ ${fmtFull(tf)}</span>`;
+      if(tm||tf) sub=`<span class="badge badge-m">♂ ${Math.round(tm).toLocaleString()}</span>`+
+                     `<span class="badge badge-f">♀ ${Math.round(tf).toLocaleString()}</span>`;
     }
     if(met.key==='grants_value'){
-      sub=`<span style="color:var(--muted)">${m.grants_count||0} grants awarded</span>`;
+      const gc=m.grants_count||0;
+      if(gc) sub=`<span style="color:var(--muted)">${Math.round(gc).toLocaleString()} grants</span>`;
     }
-    return `<div class="kpi" style="--accent:${met.color}">
-      <div class="kpi-label">${met.icon} ${met.label}</div>
-      <div class="kpi-value">${fmt(v,met.prefix)}</div>
+    const heroClass = met.hero?'hero':'';
+    return `<div class="kpi ${heroClass}" style="--accent:${met.color};--accent-bg:${met.color}18" data-kpi-val="${v}" data-kpi-prefix="${met.prefix}">
+      <div class="kpi-label">${met.label}</div>
+      <div class="kpi-value" style="color:${met.color}">${met.prefix}${v.toLocaleString()}</div>
       ${sub?`<div class="kpi-sub">${sub}</div>`:''}
     </div>`;
   });
   document.getElementById('kpi-grid').innerHTML = rows.join('');
+  // Trigger count-up on each card
+  document.querySelectorAll('#kpi-grid .kpi').forEach(card=>{
+    const val = parseFloat(card.dataset.kpiVal)||0;
+    const pfx = card.dataset.kpiPrefix||'';
+    const el  = card.querySelector('.kpi-value');
+    if(el && val>0) countUp(el, val, pfx, 900);
+  });
 }
 
 // ── Checkbox group builder (reusable) ────────────────────────────────────────
@@ -614,13 +665,13 @@ function buildCheckGroup(containerId, stateKey, onChangeFn){
   wrap.innerHTML = `
     <label class="mcheck-item all-item">
       <input type="checkbox" id="${containerId}-all" ${allChecked()?'checked':''}>
-      <span>Select All</span>
+      <span>All Metrics</span>
     </label>
-    <div class="mcheck-sep"></div>
     ${METRICS.map(m=>`
       <label class="mcheck-item" style="--chk-col:${m.color}">
         <input type="checkbox" data-mk="${m.key}" ${state[stateKey].includes(m.key)?'checked':''}>
-        <span>${m.icon} ${m.label}</span>
+        <span class="mcheck-dot"></span>
+        <span>${m.label}</span>
       </label>`).join('')}`;
 
   // "Select All" checkbox
@@ -650,6 +701,13 @@ function buildCheckGroup(containerId, stateKey, onChangeFn){
   allBox.indeterminate = state[stateKey].length > 0 && state[stateKey].length < METRICS.length;
 }
 
+// ── Chart.js global defaults ────────────────────────────────────────────────
+Chart.defaults.font.family = "'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif";
+Chart.defaults.font.size   = 12;
+Chart.defaults.animation   = { duration:900, easing:'easeInOutQuart' };
+Chart.defaults.plugins.legend.labels.boxWidth = 12;
+Chart.defaults.plugins.legend.labels.padding  = 16;
+
 // ── Trend Chart ─────────────────────────────────────────────────────────────
 function renderTrendChecks(){
   buildCheckGroup('trend-checks', 'activeMetrics', updateTrend);
@@ -664,9 +722,10 @@ function buildTrendDatasets(){
       const vals = years.map(yr=>aggregate([yr],ctrs)[m.key]||0);
       return {
         label:m.label, data:vals,
-        borderColor:m.color, backgroundColor:m.color+'22',
-        borderWidth:2.5, pointRadius:4, pointHoverRadius:7,
-        fill:false, tension:0.3,
+        borderColor:m.color, backgroundColor:m.color+'28',
+        borderWidth:3, pointRadius:5, pointHoverRadius:9,
+        pointBackgroundColor:m.color, pointBorderColor:'#fff', pointBorderWidth:2,
+        fill:false, tension:0.4,
         yAxisID: m.key==='grants_value'?'y2':'y1'
       };
     })
@@ -690,9 +749,9 @@ function initTrend(){
         }
       },
       scales:{
-        x:{grid:{color:'#F1F5F9'},ticks:{color:'#64748B'}},
-        y1:{position:'left',grid:{color:'#F1F5F9'},ticks:{color:'#64748B',callback:v=>v>=1000?v/1000+'K':v}},
-        y2:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#64748B',callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v)}}
+        x:{grid:{color:'#F0F4F9'},ticks:{color:'#6B7280',font:{size:11}}},
+        y1:{position:'left',grid:{color:'#F0F4F9'},ticks:{color:'#6B7280',font:{size:11},callback:v=>v>=1000000?(v/1000000).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v}},
+        y2:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#6B7280',font:{size:11},callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v)}}
       }
     }
   });
@@ -790,8 +849,8 @@ function renderGender(){
   charts.gender = new Chart(ctx,{
     type:'bar',
     data:{labels:years,datasets:[
-      {label:'Male',data:mVals,backgroundColor:'#B8C9D9',borderColor:'#243649',borderWidth:1,borderRadius:3,stack:'g'},
-      {label:'Female',data:fVals,backgroundColor:'#FAF0CB',borderColor:'#DFA12C',borderWidth:1,borderRadius:3,stack:'g'},
+      {label:'Male',data:mVals,backgroundColor:'#BFDBFE',borderColor:'#3B82F6',borderWidth:1.5,borderRadius:4,stack:'g'},
+      {label:'Female',data:fVals,backgroundColor:'#FBCFE8',borderColor:'#EC4899',borderWidth:1.5,borderRadius:4,stack:'g'},
     ]},
     options:{
       responsive:true,maintainAspectRatio:false,
@@ -802,8 +861,8 @@ function renderGender(){
         }
       },
       scales:{
-        x:{stacked:true,grid:{color:'#F1F5F9'},ticks:{color:'#64748B'}},
-        y:{stacked:true,grid:{color:'#F1F5F9'},ticks:{color:'#64748B',callback:v=>v>=1000?v/1000+'K':v}}
+        x:{stacked:true,grid:{color:'#F0F4F9'},ticks:{color:'#6B7280',font:{size:11}}},
+        y:{stacked:true,grid:{color:'#F0F4F9'},ticks:{color:'#6B7280',font:{size:11},callback:v=>v>=1000?(v/1000).toFixed(0)+'K':v}}
       }
     }
   });
@@ -839,8 +898,8 @@ function renderGrants(){
         }
       },
       scales:{
-        x:{grid:{color:'#F1F5F9'},ticks:{color:'#64748B',callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v)}},
-        y:{grid:{display:false},ticks:{color:'#64748B',font:{size:11}}}
+        x:{grid:{color:'#F0F4F9'},ticks:{color:'#6B7280',font:{size:11},callback:v=>'$'+v.toLocaleString()}},
+        y:{grid:{display:false},ticks:{color:'#6B7280',font:{size:10}}}
       }
     }
   });
