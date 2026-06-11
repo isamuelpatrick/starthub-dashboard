@@ -606,7 +606,7 @@ function initTrend(){
       responsive:true, maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
       onClick:(e,els)=>{ if(els.length && charts.trend) openModal(charts.trend.data.labels[els[0].index]); },
-        animation:{duration:900,easing:'easeOutQuart',onComplete:()=>wrap.classList.remove('loading')},
+      animation:{duration:900,easing:'easeOutQuart',onComplete:()=>wrap.classList.remove('loading')},
       plugins:{
         legend:{display:false},
         tooltip:{
@@ -647,6 +647,7 @@ function renderDonut(){
     }]},
     options:{
       responsive:true,maintainAspectRatio:false,cutout:'62%',
+      interaction:{mode:'nearest',intersect:true},
       plugins:{
         legend:{position:'bottom',labels:{color:'#9ca3af',font:{size:11},padding:14,usePointStyle:true}},
         tooltip:{
@@ -725,6 +726,7 @@ function renderGender(){
     ]},
     options:{
       responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
       plugins:{
         legend:{position:'top',labels:{color:'#9ca3af',font:{size:11},usePointStyle:true}},
         tooltip:{backgroundColor:'#042a2b',borderColor:'#0a4a4d',borderWidth:1,cornerRadius:6,
@@ -762,6 +764,7 @@ function renderGrants(){
     },
     options:{
       indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
       plugins:{
         legend:{display:false},
         tooltip:{backgroundColor:'#042a2b',borderColor:'#0a4a4d',borderWidth:1,cornerRadius:6,
@@ -1061,11 +1064,12 @@ function buildMultiSelect(cfg){
 }
 document.addEventListener('click',function(){document.querySelectorAll('.ms-wrap.open').forEach(function(w){w.classList.remove('open');});});
 
-// ── Chart.js defaults (GN brand) ──────────────────────────────────────────
+// ── Chart.js defaults (brand) ─────────────────────────────────────────────
 Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif";
 Chart.defaults.font.size   = 11;
 Chart.defaults.color       = '#9ca3af';
-Chart.defaults.animation   = {duration:900,easing:'easeOutQuart'};
+// Global interaction: show tooltip on nearest element without requiring exact hit
+Chart.defaults.interaction = {mode:'nearest', intersect:false};
 
 function init(){
   document.getElementById('updated-date').textContent=DATA.updated;
