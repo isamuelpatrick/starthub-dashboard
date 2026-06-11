@@ -572,7 +572,7 @@ select{{
 <!-- Header -->
 <div id="header">
   <div class="logo">
-    <img src="data:image/jpeg;base64,{{logo_b64}}" alt="StartHub Africa" style="height:40px;object-fit:contain;flex-shrink:0">
+    <img src="data:image/jpeg;base64,{logo_b64}" alt="StartHub Africa" style="height:40px;object-fit:contain;flex-shrink:0">
     <div class="logo-text"><h1>StartHub Africa</h1><span>Impact Dashboard</span></div>
   </div>
   <div class="header-sep"></div>
