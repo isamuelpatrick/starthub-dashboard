@@ -1437,7 +1437,7 @@ function init(){{
 
   // Year multi-select — pre-select all years so dashboard loads full
   getYears().forEach(function(yr){{if(!state.years.includes(yr))state.years.push(yr);}});
-  buildMultiSelect({{id:'ms-year',label:'Year',items:getYears().map(yr=>({{value:yr,label:yr}})),state_arr:state.years,onChange:function(){{state.drillSelected=null;renderAll();}}}});
+  buildMultiSelect({{id:'ms-year',label:'Year',items:getYears().slice().reverse().map(yr=>({{value:yr,label:yr}})),state_arr:state.years,onChange:function(){{state.drillSelected=null;renderAll();}}}});
 
   // Country multi-select — pre-select all countries
   COUNTRIES.forEach(function(c){{if(!state.countries.includes(c))state.countries.push(c);}});
